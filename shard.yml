@@ -1,0 +1,9 @@
+name: crDFA
+version: 0.1.0
+
+authors:
+  -  <>
+
+crystal: 0.21.1
+
+license: MIT
