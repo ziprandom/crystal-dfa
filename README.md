@@ -1,14 +1,14 @@
 # crDFA
 
-A Regex Syntax Parser, and Thompson NFA Transformer and Matcher based on [Russ Cox's Article "Regular Expression Matching Can Be Simple And Fast"](https://swtch.com/~rsc/regexp/regexp1.html) with Parse Tree Simplifications from [Guangming Xings Paper Minimized Thompson NFA - Chapter 3](http://people.wku.edu/guangming.xing/thompsonnfa.pdf) aiming at further creating a DFA tom improve performance.
+A Regex syntax parser, and Thompson NFA transformer and matcher based on Russ Cox's article ["Regular Expression Matching Can Be Simple And Fast"](https://swtch.com/~rsc/regexp/regexp1.html) with parse tree simplifications from Guangming Xings paper [Minimized Thompson NFA - Chapter 3](http://people.wku.edu/guangming.xing/thompsonnfa.pdf) aiming at further creating a DFA to improve performance.
 
-Currently implemented Regex Syntax:
+Currently implemented Regex syntax:
 
-* Literals and concatenation `ab`
-* Quantifiers `*`, `+`, `?` and Alternation `|`
-* Groupings `a(ab)` (no capturing)
-* Quantifiers `{2,4}`, `{2}`, `{4,}`
-* Character Classes `[a-bK-Lxyß]` (negation missing)
+* literals and concatenation `ab`
+* quantifiers `*`, `+`, `?` and alternation `|`
+* groupings `a(ab)` (no capturing)
+* quantifiers `{2,4}`, `{2}`, `{4,}`
+* character classes `[a-bK-Lxyß]` (negation missing)
 
 Performance still lacks behind PCRE.
 

@@ -1,6 +1,6 @@
 # coding: utf-8
 require "./nodes"
-require "../../core_ext/*"
+require "../core_ext/*"
 
 module CrDFA
   class Parser
