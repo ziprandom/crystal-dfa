@@ -116,31 +116,34 @@ module DFA
     end
 
     private def parse_quantification(index, tokens)
-      exact, min, max = nil, nil, nil
-      skip = 0
-      if tokens[index + 1][0] == :ALPHANUM
-        if tokens[index + 2][0] == :RCURLY
-          # exact number
-          # @ast << QuantifierNode.new(@ast.pop, tokens[index+1][1].to_i)
-          exact = tokens[index + 1][1].to_i
-          skip = 2
-        elsif tokens[index + 2][0] == :COMMA
-          if tokens[index + 3][0] == :ALPHANUM && tokens[index + 4][0] == :RCURLY
-            # min, max quantifier
-            # @ast << QuantifierNode.new(@ast.pop, nil, tokens[index+1][1].to_i, tokens[index+3][1].to_i)
-            min, max = tokens[index + 1][1].to_i, tokens[index + 3][1].to_i
-            skip = 4
-          elsif tokens[index + 3][0] == :RCURLY
-            # min quantifier
-            # @ast << QuantifierNode.new(@ast.pop, nil, tokens[index+1][1].to_i)
-            min = tokens[index + 1][1].to_i
-            skip = 3
+      exact, min, max = "", "", ""
+      comma, ix = nil, index + 1
+      t, v = tokens[ix]
+      while [:ALPHANUM, :COMMA].includes? t
+        case t
+        when :ALPHANUM
+          if comma
+            max += v
+          else
+            exact += v
           end
-        else
-          raise "expected a number at position #{tokens[index + 1][2]}"
+        when :COMMA
+          comma = ix
+          min = exact
         end
+        t, v = tokens[(ix+=1)]
       end
-      return {skip, exact, min, max}
+      if comma == ix - 1
+        min = exact
+      end
+      begin
+        exact = comma ? nil : exact.to_i
+        min = min.blank? ? nil : min.to_i
+        max = max.blank? ? nil : max.to_i
+      rescue e
+        raise "failed parsing the quantification. "
+      end
+      return ({ix - index, exact.as(Int32?), min.as(Int32?), max.as(Int32?)})
     end
 
     def tokenize(string)
