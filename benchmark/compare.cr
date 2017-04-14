@@ -10,7 +10,7 @@ puts %{building "#{expression}" with Regex (PCRE)}
 puts Benchmark.measure { rx1 = Regex.new(expression) }
 rx1 = rx1.not_nil!
 puts %{building "#{expression}" with RegExp (own impl}
-puts Benchmark.measure { rx2 = CrDFA::RegExp.new(expression) }
+puts Benchmark.measure { rx2 = DFA::RegExp.new(expression) }
 rx2 = rx2.not_nil!
 
 puts

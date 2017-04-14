@@ -1,7 +1,7 @@
 require "./core_ext/*"
 require "./crDFA/**"
 
-module CrDFA
+module DFA
   module V1
     class Expression
       def to_graph

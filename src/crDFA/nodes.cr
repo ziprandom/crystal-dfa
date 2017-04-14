@@ -1,4 +1,4 @@
-module CrDFA
+module DFA
   class ASTNode
   end
 

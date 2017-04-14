@@ -1,4 +1,4 @@
-# crDFA
+# crystal-dfa
 
 A Regex syntax parser, and Thompson NFA transformer and matcher based on Russ Cox's article ["Regular Expression Matching Can Be Simple And Fast"](https://swtch.com/~rsc/regexp/regexp1.html) with parse tree simplifications from Guangming Xings paper [Minimized Thompson NFA - Chapter 3](http://people.wku.edu/guangming.xing/thompsonnfa.pdf) aiming at further creating a DFA to improve performance.
 
@@ -38,19 +38,19 @@ Add this to your application's `shard.yml`:
 
 ```yaml
 dependencies:
-  crDFA:
-    github: ziprandom/crDFA
+  crystal-dfa:
+    github: ziprandom/crystal-dfa
 ```
 
 ## Usage
 
 ```crystal
-require "crDFA"
+require "crystal-dfa"
 ```
 
 ## Contributing
 
-1. Fork it ( https://github.com/ziprandom/crDFA/fork )
+1. Fork it ( https://github.com/ziprandom/crystal-dfa/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)

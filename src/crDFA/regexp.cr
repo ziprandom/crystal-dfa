@@ -1,15 +1,15 @@
 require "./parser"
 require "./smart_parsing"
 
-module CrDFA
+module DFA
   class RegExp
-    @nfa : CrDFA::NFA::State
+    @nfa : DFA::NFA::State
 
     def initialize(expression : String)
-      @nfa = CrDFA::NFA.create_nfa(
-        CrDFA::SmartParsing.flatten_out_quantifications(
-          CrDFA::SmartParsing.detangle_character_ranges(
-            CrDFA::Parser.parse(expression)
+      @nfa = DFA::NFA.create_nfa(
+        DFA::SmartParsing.flatten_out_quantifications(
+          DFA::SmartParsing.detangle_character_ranges(
+            DFA::Parser.parse(expression)
           )
         )
       )
@@ -20,7 +20,7 @@ module CrDFA
     end
 
     def match(string)
-      CrDFA::NFA.match(@nfa, string)
+      DFA::NFA.match(@nfa, string)
     end
   end
 end

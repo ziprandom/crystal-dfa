@@ -1,9 +1,9 @@
 def match_state
-  CrDFA::NFA::State.new CrDFA::NFA::MATCH
+  DFA::NFA::State.new DFA::NFA::MATCH
 end
 
 def split_state(a, b)
-  CrDFA::NFA::State.new(CrDFA::NFA::SPLIT, a, b)
+  DFA::NFA::State.new(DFA::NFA::SPLIT, a, b)
 end
 
 def l_state(c : Char)
@@ -11,10 +11,10 @@ def l_state(c : Char)
 end
 
 def r_state(b : Char, e : Char)
-  s = CrDFA::NFA::State.new({b.ord, e.ord}, match_state)
+  s = DFA::NFA::State.new({b.ord, e.ord}, match_state)
 end
 
-class CrDFA::NFA::State
+class DFA::NFA::State
   def ==(other)
     rec_eql(other)
   end

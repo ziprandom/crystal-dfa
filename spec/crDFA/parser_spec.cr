@@ -20,10 +20,10 @@ EXPRESSIONS = [
   "\\-?(0|[1-9][0-9]*)(\\.[0-9]+)?((e|E)?(\\+|\\-)?[0-9]+)?",
 ]
 
-describe CrDFA::Parser do
+describe DFA::Parser do
   EXPRESSIONS.each do |exp|
     it "parses #{exp}" do
-      CrDFA::Parser.parse(exp, false).to_s.should eq exp
+      DFA::Parser.parse(exp, false).to_s.should eq exp
     end
   end
 
@@ -36,7 +36,7 @@ describe CrDFA::Parser do
     ([^"\\\\]|\\.)*
     expression
 
-    CrDFA::Parser.parse(expression, false).to_s.should eq expected
+    DFA::Parser.parse(expression, false).to_s.should eq expected
   end
 
   it "optimizes away nested star statements and unnecessary groups" do
@@ -44,10 +44,10 @@ describe CrDFA::Parser do
     (((a|b)*)*)*
     expression
 
-    ast = CrDFA::Parser.parse(expression, false)
+    ast = DFA::Parser.parse(expression, false)
     ast.to_s.should eq "(((a|b)*)*)*"
 
-    ast = CrDFA::Parser.parse(expression)
+    ast = DFA::Parser.parse(expression)
     ast.to_s.should eq "(a|b)*"
   end
 
@@ -56,13 +56,13 @@ describe CrDFA::Parser do
     (a*|b*)*
     expression
 
-    ast = CrDFA::Parser.parse(expression, false)
+    ast = DFA::Parser.parse(expression, false)
     ast.to_s.should eq "(a*|b*)*"
 
-    ast = CrDFA::Parser.parse(expression)
+    ast = DFA::Parser.parse(expression)
     ast.to_s.should eq "(a|b)*"
 
-    CrDFA::Parser.parse("(a*|b*|c*)*").to_s.should eq "(a|b|c)*"
+    DFA::Parser.parse("(a*|b*|c*)*").to_s.should eq "(a|b|c)*"
   end
 
   it "optimizes away nested star statements in and around alternation groups" do
@@ -70,13 +70,13 @@ describe CrDFA::Parser do
     (a*|b)*
     expression
 
-    ast = CrDFA::Parser.parse(expression, false)
+    ast = DFA::Parser.parse(expression, false)
     ast.to_s.should eq "(a*|b)*"
 
-    ast = CrDFA::Parser.parse(expression)
+    ast = DFA::Parser.parse(expression)
     ast.to_s.should eq "(a|b)*"
 
-    CrDFA::Parser.parse("(a*|b|c*|d)*").to_s.should eq "(a|b|c|d)*"
+    DFA::Parser.parse("(a*|b|c*|d)*").to_s.should eq "(a|b|c|d)*"
   end
 
   it "splits CharacterClassNodes into atomic (single range) CharacterClassNodes & LiteralNodes" do
@@ -84,8 +84,8 @@ describe CrDFA::Parser do
     [a-fi-jxy]
     expression
 
-    ast = CrDFA::Parser.parse(expression)
-    CrDFA::SmartParsing.detangle_character_ranges(ast).to_s.should eq "[a-f]|[i-j]|x|y"
+    ast = DFA::Parser.parse(expression)
+    DFA::SmartParsing.detangle_character_ranges(ast).to_s.should eq "[a-f]|[i-j]|x|y"
   end
 
   it "splits Quantifier into atomic (single range) CharacterClassNodes & LiteralNodes" do
@@ -95,7 +95,7 @@ describe CrDFA::Parser do
 
     expected = "aabbb?b?cccc+[a-z][a-z][a-z]+"
 
-    ast = CrDFA::Parser.parse(expression)
-    CrDFA::SmartParsing.flatten_out_quantifications(ast).to_s.should eq expected
+    ast = DFA::Parser.parse(expression)
+    DFA::SmartParsing.flatten_out_quantifications(ast).to_s.should eq expected
   end
 end

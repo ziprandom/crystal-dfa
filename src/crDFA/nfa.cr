@@ -6,9 +6,9 @@ require "./traverse"
 # https://swtch.com/~rsc/regexp/regexp1.html &
 # http://stackoverflow.com/a/25832898
 #
-module CrDFA
+module DFA
   module NFA
-    include CrDFA::Traverse
+    include DFA::Traverse
 
     MATCH = {256, 256}
     SPLIT = {257, 257}
@@ -54,7 +54,7 @@ module CrDFA
       end
     end
 
-    def self.create_nfa(ast : CrDFA::ASTNode)
+    def self.create_nfa(ast : DFA::ASTNode)
       nfa = Array(Fragment).new
 
       # iterate the ast tree starting

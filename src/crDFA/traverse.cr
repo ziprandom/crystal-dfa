@@ -1,4 +1,4 @@
-module CrDFA
+module DFA
   module Traverse
     macro included
 

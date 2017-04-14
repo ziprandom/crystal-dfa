@@ -2,7 +2,7 @@
 require "./nodes"
 require "../core_ext/*"
 
-module CrDFA
+module DFA
   class Parser
     @group_start_stack = Array(Int32).new
     @character_group_stack = Array(Int32).new
@@ -11,7 +11,7 @@ module CrDFA
     def self.parse(string, optimize = true)
       ast = self.new.parse(string)
       if ast && optimize
-        CrDFA::SmartParsing.optimize(ast).not_nil!
+        DFA::SmartParsing.optimize(ast).not_nil!
       else
         ast
       end
