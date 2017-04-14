@@ -8,7 +8,7 @@ Currently implemented Regex syntax:
 * quantifiers `*`, `+`, `?` and alternation `|`
 * groupings `a(ab)` (no capturing)
 * quantifiers `{2,4}`, `{2}`, `{4,}`
-* character classes `[a-bK-Lxyß]` (negation missing)
+* character classes `[^a-bK-Lxyß]`
 
 Performance still lacks behind PCRE.
 

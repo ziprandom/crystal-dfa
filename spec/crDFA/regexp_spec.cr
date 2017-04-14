@@ -33,12 +33,50 @@ describe DFA::RegExp do
     rex.match(%{"haaaAGCö"}).should eq false
   end
 
-  it "matches a string against a negative character class" do
+  it "matches a string against a negative character class with one range" do
     rex = DFA::RegExp.new %{"[^a-z]+"}
     rex.match(%{"123"}).should eq true
     rex.match(%{"AM"}).should eq true
     rex.match(%{"haaaß"}).should eq false
     rex.match(%{"haaaA"}).should eq false
+  end
+
+  it "matches a string against a negative character class containing more ranges" do
+    rex = DFA::RegExp.new "[^0-9A-Za-z]"
+    rex.match("1").should eq false
+    rex.match("A").should eq false
+    rex.match("a").should eq false
+    rex.match("<").should eq true
+  end
+
+  it "matches a string against a negative character class containing more ranges" do
+    rex = DFA::RegExp.new "[^aD<]"
+    rex.match("1").should eq true
+    rex.match("A").should eq true
+    rex.match("a").should eq false
+    rex.match("D").should eq false
+    rex.match("<").should eq false
+  end
+
+  it "matches a string against a negative character class containing single literals" do
+    rex = DFA::RegExp.new "[^a-zABC]"
+    rex.match("a").should eq false
+    rex.match("A").should eq false
+    rex.match("B").should eq false
+    rex.match("C").should eq false
+    rex.match("D").should eq true
+    rex.match("1").should eq true
+    rex.match("ß").should eq true
+  end
+
+  it "matches a negative character class containing multiple ranges and single literals" do
+    rex = DFA::RegExp.new "[^a-zA-Z35]"
+    rex.match("g").should eq false
+    rex.match("C").should eq false
+    rex.match("3").should eq false
+    rex.match("5").should eq false
+    rex.match("4").should eq true
+    rex.match("1").should eq true
   end
 
 end

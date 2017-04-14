@@ -100,15 +100,15 @@ module DFA
         # store literal values as {begin, end} anyway
         when CharacterClassNode
           r = node.ranges.first
-          if node.negate
-            below = State.new({0, r.begin[0].ord-1})
-            above = State.new({r.end[0].ord+1, Char::MAX_CODEPOINT-1})
-            split = State.new(SPLIT, below, above)
-            nfa.push Fragment.new split, [below.outp, above.outp]
-          else
-            state = State.new({r.begin[0].ord, r.end[0].ord})
+#          if node.negate
+#            below = State.new({0, r.begin[0].ord-1})
+#            above = State.new({r.end[0].ord+1, Char::MAX_CODEPOINT-1})
+#            split = State.new(SPLIT, below, above)
+#            nfa.push Fragment.new split, [below.outp, above.outp]
+#          else
+            state = State.new({r.begin.ord, r.end.ord})
             nfa.push Fragment.new state, [state.outp]
-          end
+#          end
         end
         nil
       end

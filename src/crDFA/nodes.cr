@@ -88,11 +88,14 @@ module DFA
 
     def initialize(
                    @negate : Bool, @characters : Array(String),
-                   @ranges : Array(Range(String, String)),
+                   @ranges : Array(Range(Char, Char)),
                    @source : String = ""); end
 
     def to_s
-      r_to_s = @ranges.sort_by(&.begin).map { |r| "#{r.begin}-#{r.end}" }.join
+      r_to_s = @ranges.sort_by(&.begin).map do |r|
+        r.begin != r.end ?
+          "#{r.begin}-#{r.end}" : "#{r.begin}"
+      end.join
       c_to_s = characters.join
       "[" + (negate ? "^" : "") + r_to_s + c_to_s + "]"
     end

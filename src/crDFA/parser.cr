@@ -90,7 +90,7 @@ module DFA
 
     private def parse_character_class(tokens, string)
       index = -1
-      ranges = Array(Range(String, String)).new
+      ranges = Array(Range(Char, Char)).new
       negate = false
       characters = Array(String).new
       while (index += 1) && index < tokens.size
@@ -101,7 +101,7 @@ module DFA
           end
         when :ALPHANUM, :QSTM, :COMMA, :PLUS
           if tokens[index + 1][0] == :MINUS && tokens[index + 2][0] == :ALPHANUM
-            ranges << (tokens[index][1]..tokens[index + 2][1])
+            ranges << (tokens[index][1][0]..tokens[index + 2][1][0])
             index += 2
           else
             characters << tokens[index][1]

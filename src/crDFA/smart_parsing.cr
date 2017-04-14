@@ -16,23 +16,33 @@ module DFA
       visit(tree) do |node|
         case node
         when DFA::CharacterClassNode
-          next node if node.as(DFA::CharacterClassNode).negate
-          # no negation support atm
-          split_ranges = node.ranges.map do |r|
-            DFA::CharacterClassNode.new(false, Array(String).new, [r])
+          c_ranges = node.characters.map { |c| (c[0]..c[0]) }
+          all_ranges = Range.disjoin(c_ranges + node.ranges).sort_by(&.begin)
+
+          if node.as(DFA::CharacterClassNode).negate
+            all_ranges = invert_disjunct_character_range_sets(all_ranges)
           end
-          split_literals = node.characters.reject do |s|
-            # remove characters that are already
-            # included in a range
-            node.ranges.any? &.includes? s
-          end.map do |s|
-            DFA::LiteralNode.new(s)
-          end
-          options = split_ranges + split_literals
+
+          options = all_ranges.map { |r| DFA::CharacterClassNode.new(false, [] of String, [r]).as(DFA::ASTNode) }
           options.size > 1 ? DFA::AlternationNode.new(options) :
             options.first
         end
       end
+    end
+
+    private def self.invert_disjunct_character_range_sets(ranges)
+      ranges.map_with_index do |r, index|
+        case index
+        when 0 then
+          (0.unsafe_chr..r.begin.pred)
+        else
+          prev = ranges[index-1]
+          next if prev.end.succ == r.begin
+          (prev.end.succ..r.begin.pred)
+        end.as(Range(Char, Char)?)
+      end.compact.flatten + [
+        (ranges.last.end.succ..Char::MAX_CODEPOINT.unsafe_chr)
+      ]
     end
 
     def self.flatten_out_quantifications(tree)
