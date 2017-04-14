@@ -16,6 +16,7 @@ module DFA
       visit(tree) do |node|
         case node
         when DFA::CharacterClassNode
+          next node if node.as(DFA::CharacterClassNode).negate
           # no negation support atm
           split_ranges = node.ranges.map do |r|
             DFA::CharacterClassNode.new(false, Array(String).new, [r])
@@ -27,7 +28,9 @@ module DFA
           end.map do |s|
             DFA::LiteralNode.new(s)
           end
-          DFA::AlternationNode.new(split_ranges + split_literals)
+          options = split_ranges + split_literals
+          options.size > 1 ? DFA::AlternationNode.new(options) :
+            options.first
         end
       end
     end
