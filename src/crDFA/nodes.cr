@@ -3,10 +3,10 @@ module DFA
   end
 
   class LiteralNode < ASTNode
-    def initialize(@value : String); end
+    def initialize(@value : Char); end
 
     def to_s
-      @value
+      @value.to_s
     end
   end
 

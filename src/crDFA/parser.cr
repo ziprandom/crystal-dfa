@@ -42,12 +42,13 @@ module DFA
             oring = false
           end
           @ast = @ast.shift(@group_start_stack.pop) << GroupNode.new(@ast.size > 1 ? ConcatNode.new(@ast) : @ast.first)
-        when :ALPHANUM
+        when :ALPHANUM, :MINUS
           value = token[1]
-          @ast << LiteralNode.new(value)
+          @ast << LiteralNode.new(value[0])
         when :STAR then @ast << StarNode.new(@ast.pop)
         when :PLUS then @ast << PlusNode.new(@ast.pop)
         when :QSTM then @ast << QSTMNode.new(@ast.pop)
+        when :SPECIAL then @ast << self.class.make_special_node(token[1])
         when :LCURLY
           skip, exact, min, max = parse_quantification(index, tokens)
           @ast << QuantifierNode.new(@ast.pop, exact, min, max)
@@ -66,6 +67,30 @@ module DFA
         set_current_scope_ast(consumeLastOrAlternative(current_scope_ast))
       end
       @ast.size > 1 ? ConcatNode.new(@ast) : @ast.first
+    end
+
+
+     ANY_CHAR_RANGES    =  [0.unsafe_chr..Char::MAX_CODEPOINT.unsafe_chr]
+     WHITESPACE_RANGES  =  [' '..' ']
+     TAB_RANGES         =  ['\t'..'\t']
+     CR_RANGES          =  ['\r'..'\r']
+     WORD_RANGES        =  ['a'..'z', 'A'..'Z']
+     NOT_WORD_RANGES    =  [0.unsafe_chr..'`', '{'..'@', '['..Char::MAX_CODEPOINT.unsafe_chr]
+     DIGIT_RANGES       =  ['0'..'9']
+     NON_DIGIT_RANGES   =  [10.unsafe_chr..Char::MAX_CODEPOINT.unsafe_chr]
+
+
+    def self.make_special_node(string)
+      ranges = case string
+               when "s" then DFA::LiteralNode.new(WHITESPACE_RANGES.first.begin)
+               when "t" then DFA::LiteralNode.new(TAB_RANGES.first.begin)
+               when "r" then DFA::LiteralNode.new(CR_RANGES.first.begin)
+               when "w" then DFA::CharacterClassNode.new(false, Array(String).new, WORD_RANGES)
+               when "W" then DFA::CharacterClassNode.new(true, Array(String).new, WORD_RANGES)
+               when "d" then DFA::CharacterClassNode.new(false, Array(String).new, DIGIT_RANGES)
+               when "D" then DFA::CharacterClassNode.new(true, Array(String).new, DIGIT_RANGES)
+               else DFA::CharacterClassNode.new(false, Array(String).new, ANY_CHAR_RANGES)
+               end
     end
 
     def current_scope_ast
@@ -93,6 +118,7 @@ module DFA
       ranges = Array(Range(Char, Char)).new
       negate = false
       characters = Array(String).new
+
       while (index += 1) && index < tokens.size
         case tokens[index][0]
         when :ROF
@@ -105,6 +131,17 @@ module DFA
             index += 2
           else
             characters << tokens[index][1]
+          end
+        when :SPECIAL
+          case tokens[index][1]
+          when "s" then characters << WHITESPACE_RANGES.first.begin.to_s
+          when "t" then characters << TAB_RANGES.first.begin.to_s
+          when "r" then characters << CR_RANGES.first.begin.to_s
+          when "w" then ranges += WORD_RANGES
+          when "W" then ranges += NOT_WORD_RANGES
+          when "d" then ranges += DIGIT_RANGES
+          when "D" then ranges += NON_DIGIT_RANGES
+          else ranges += ANY_CHAR_RANGES
           end
         when :RBRACK
           break
@@ -151,25 +188,31 @@ module DFA
       index = -1
       while (index += 1) < string.size
         tokens << case s = string[index].to_s
-        when "(" then {:LPAR, s, index}
-        when ")" then {:RPAR, s, index}
-        when "[" then {:LBRACK, s, index}
-        when "]" then {:RBRACK, s, index}
-        when "{" then {:LCURLY, s, index}
-        when "}" then {:RCURLY, s, index}
-        when "," then {:COMMA, s, index}
-        when "|" then {:PIPE, s, index}
-        when "*" then {:STAR, s, index}
-        when "+" then {:PLUS, s, index}
-        when "-" then {:MINUS, s, index}
-        when "?" then {:QSTM, s, index}
-        when "^" then {:ROF, s, index}
-        when "\\"
-          index += 1
-          {:ALPHANUM, "\\#{string[index]}", index - 1}
-        else
-          {:ALPHANUM, string[index].to_s, index}
-        end
+                  when "(" then {:LPAR, s, index}
+                  when ")" then {:RPAR, s, index}
+                  when "[" then {:LBRACK, s, index}
+                  when "]" then {:RBRACK, s, index}
+                  when "{" then {:LCURLY, s, index}
+                  when "}" then {:RCURLY, s, index}
+                  when "," then {:COMMA, s, index}
+                  when "|" then {:PIPE, s, index}
+                  when "*" then {:STAR, s, index}
+                  when "+" then {:PLUS, s, index}
+                  when "-" then {:MINUS, s, index}
+                  when "?" then {:QSTM, s, index}
+                  when "^" then {:ROF, s, index}
+                  when "." then {:SPECIAL, s, index}
+                  when "\\"
+                    index += 1
+                    case s = string[index].to_s
+                    when "s", "t", "r", "w", "W", "d", "D"
+                      {:SPECIAL, s, index-1}
+                    else
+                      {:ALPHANUM, "#{s}", index - 1}
+                    end
+                  else
+                    {:ALPHANUM, string[index].to_s, index}
+                  end
       end
       tokens
     end

@@ -1,6 +1,16 @@
 require "./core_ext/*"
 require "./crDFA/**"
 
+#
+# Lets use crystals convenient /.../
+# syntax. this way we loose time while
+# the PCRE regex is initialized ...
+class Regex
+  def cr
+    DFA::RegExp.new @source
+  end
+end
+
 module DFA
   module V1
     class Expression

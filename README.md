@@ -9,6 +9,7 @@ Currently implemented Regex syntax:
 * groupings `a(ab)` (no capturing)
 * quantifiers `{2,4}`, `{2}`, `{4,}`
 * character classes `[^a-bK-Lxyß]`
+* special character classes `\s`, `\t`, `\r`, `\d`, `\w`, `\W`, `\D`
 
 Performance still lacks behind PCRE.
 

@@ -3,7 +3,7 @@ require "../spec_helper"
 describe DFA::NFA do
   describe "Creation of an NFA from a Parsetree" do
     it "creates a state for a LiteralNode" do
-      ast = DFA::LiteralNode.new("a").as(DFA::ASTNode)
+      ast = DFA::LiteralNode.new('a').as(DFA::ASTNode)
       expected = l_state('a').tap &.out = match_state
       DFA::NFA.create_nfa(ast).should eq expected
     end
@@ -11,8 +11,8 @@ describe DFA::NFA do
     it "creates a state for a ConcateNode" do
       it "works for the binary case" do
         ast = DFA::ConcatNode.new [
-          DFA::LiteralNode.new("a").as(DFA::ASTNode),
-          DFA::LiteralNode.new("b").as(DFA::ASTNode),
+          DFA::LiteralNode.new('a').as(DFA::ASTNode),
+          DFA::LiteralNode.new('b').as(DFA::ASTNode),
         ]
 
         expected = l_state('a').tap &.out = l_state('b').tap &.out = match_state
@@ -21,9 +21,9 @@ describe DFA::NFA do
 
       it "works for more than one element in the concatenation" do
         ast = DFA::ConcatNode.new [
-          DFA::LiteralNode.new("a").as(DFA::ASTNode),
-          DFA::LiteralNode.new("b").as(DFA::ASTNode),
-          DFA::LiteralNode.new("c").as(DFA::ASTNode),
+          DFA::LiteralNode.new('a').as(DFA::ASTNode),
+          DFA::LiteralNode.new('b').as(DFA::ASTNode),
+          DFA::LiteralNode.new('c').as(DFA::ASTNode),
         ]
 
         expected = l_state('a').tap &.out = l_state('b').tap &.out = l_state('c').tap &.out = match_state
@@ -34,8 +34,8 @@ describe DFA::NFA do
     it "creates a state for an AlternationNode" do
       it "works for the binary case" do
         ast = DFA::AlternationNode.new [
-          DFA::LiteralNode.new("a").as(DFA::ASTNode),
-          DFA::LiteralNode.new("b").as(DFA::ASTNode),
+          DFA::LiteralNode.new('a').as(DFA::ASTNode),
+          DFA::LiteralNode.new('b').as(DFA::ASTNode),
         ]
 
         expected = split_state(
@@ -48,9 +48,9 @@ describe DFA::NFA do
 
       it "works for more than one element in the alternation" do
         ast = DFA::AlternationNode.new [
-          DFA::LiteralNode.new("a").as(DFA::ASTNode),
-          DFA::LiteralNode.new("b").as(DFA::ASTNode),
-          DFA::LiteralNode.new("c").as(DFA::ASTNode),
+          DFA::LiteralNode.new('a').as(DFA::ASTNode),
+          DFA::LiteralNode.new('b').as(DFA::ASTNode),
+          DFA::LiteralNode.new('c').as(DFA::ASTNode),
         ]
 
         expected = split_state(
@@ -66,7 +66,7 @@ describe DFA::NFA do
 
       it "creates a state for a QSTMNode(?) Zero-or-One" do
         ast = DFA::QSTMNode.new(
-          DFA::LiteralNode.new("a").as(DFA::ASTNode)
+          DFA::LiteralNode.new('a').as(DFA::ASTNode)
         )
 
         expected = split_state(
@@ -79,7 +79,7 @@ describe DFA::NFA do
 
       it "creates a state for a StarNode(*) Zero-or-More" do
         ast = DFA::StarNode.new(
-          DFA::LiteralNode.new("a").as(DFA::ASTNode)
+          DFA::LiteralNode.new('a').as(DFA::ASTNode)
         )
 
         a = l_state('a')
@@ -91,7 +91,7 @@ describe DFA::NFA do
 
       it "creates a state for a PlusNode(*) One-or-More" do
         ast = DFA::PlusNode.new(
-          DFA::LiteralNode.new("a").as(DFA::ASTNode)
+          DFA::LiteralNode.new('a').as(DFA::ASTNode)
         )
 
         expected = (a = l_state('a')).tap &.out = split_state(a, match_state)
@@ -123,7 +123,7 @@ describe DFA::NFA do
 
   describe "Matching of an Input String against an NFA" do
     it "matches a simple Literal" do
-      ast = DFA::LiteralNode.new("a").as(DFA::ASTNode)
+      ast = DFA::LiteralNode.new('a').as(DFA::ASTNode)
       nfa = DFA::NFA.create_nfa(ast)
       DFA::NFA.match(nfa, "a").should eq true
       DFA::NFA.match(nfa, "b").should eq false
@@ -131,7 +131,7 @@ describe DFA::NFA do
 
     it "matches a concatenation of simple Literals" do
       ast = DFA::ConcatNode.new [
-        DFA::LiteralNode.new("a").as(DFA::ASTNode), DFA::LiteralNode.new("a").as(DFA::ASTNode),
+        DFA::LiteralNode.new('a').as(DFA::ASTNode), DFA::LiteralNode.new('a').as(DFA::ASTNode),
       ]
       nfa = DFA::NFA.create_nfa(ast)
       DFA::NFA.match(nfa, "aa").should eq true
@@ -140,8 +140,8 @@ describe DFA::NFA do
 
     it "matches a alternation of simple Literals" do
       ast = DFA::AlternationNode.new [
-        DFA::LiteralNode.new("a").as(DFA::ASTNode),
-        DFA::LiteralNode.new("b").as(DFA::ASTNode),
+        DFA::LiteralNode.new('a').as(DFA::ASTNode),
+        DFA::LiteralNode.new('b').as(DFA::ASTNode),
       ]
       nfa = DFA::NFA.create_nfa(ast)
       DFA::NFA.match(nfa, "a").should eq true
@@ -150,7 +150,7 @@ describe DFA::NFA do
     end
 
     it "matches a alternation of simple Literals" do
-      ast = DFA::StarNode.new DFA::LiteralNode.new("a").as(DFA::ASTNode)
+      ast = DFA::StarNode.new DFA::LiteralNode.new('a').as(DFA::ASTNode)
       nfa = DFA::NFA.create_nfa(ast)
       DFA::NFA.match(nfa, "").should eq true
       DFA::NFA.match(nfa, "a").should eq true

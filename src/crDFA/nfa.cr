@@ -19,14 +19,14 @@ module DFA
     end
 
     def self.match(start : State, string : String)
-      i, listid, clist, nlist = -1, 0, [] of State, [] of State
+      i, listid, clist, nlist, size = -1, 0, [] of State, [] of State, string.size
       add_state(clist, start.clone, listid)
-      while (i += 1) < string.size
+      while (i += 1) < size
         c = string[i]
-        step(clist, c.as(Char), nlist, listid += 1)
+        step(clist, c, nlist, listid += 1)
         t = clist; clist = nlist; nlist = t
       end
-      !!clist.find { |s| s.c == MATCH }
+      clist.any? &.c.== MATCH
     end
 
     def self.step(clist, c, nlist, listid)
@@ -100,15 +100,8 @@ module DFA
         # store literal values as {begin, end} anyway
         when CharacterClassNode
           r = node.ranges.first
-#          if node.negate
-#            below = State.new({0, r.begin[0].ord-1})
-#            above = State.new({r.end[0].ord+1, Char::MAX_CODEPOINT-1})
-#            split = State.new(SPLIT, below, above)
-#            nfa.push Fragment.new split, [below.outp, above.outp]
-#          else
-            state = State.new({r.begin.ord, r.end.ord})
-            nfa.push Fragment.new state, [state.outp]
-#          end
+          state = State.new({r.begin.ord, r.end.ord})
+          nfa.push Fragment.new state, [state.outp]
         end
         nil
       end

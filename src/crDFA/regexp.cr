@@ -3,6 +3,7 @@ require "./smart_parsing"
 
 module DFA
   class RegExp
+    getter :nfa
     @nfa : DFA::NFA::State
 
     def initialize(expression : String)

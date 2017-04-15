@@ -8,7 +8,7 @@ describe DFA::RegExp do
   end
 
   it "matches a string against a more complex regex" do
-    rex = DFA::RegExp.new %{"[a-z]{2,4}"|x+}
+    rex = /"[a-z]{2,4}"|x+/.cr
     rex.match(%{"ha"}).should eq true
     rex.match(%{"haa"}).should eq true
     rex.match(%{"haaa"}).should eq true
@@ -18,7 +18,7 @@ describe DFA::RegExp do
   end
 
   it "matches a string against a character class" do
-    rex = DFA::RegExp.new %{"[a-zö]+"}
+    rex = /"[a-zö]+"/.cr
     rex.match(%{"haaa"}).should eq true
     rex.match(%{"haaa"}).should eq true
     rex.match(%{"ö"}).should eq true
@@ -28,13 +28,13 @@ describe DFA::RegExp do
   end
 
   it "matches a string against a character more complex class" do
-    rex = DFA::RegExp.new %{"[a-zA-Dö]+"}
+    rex = /"[a-zA-Dö]+"/.cr
     rex.match(%{"haaaABCö"}).should eq true
     rex.match(%{"haaaAGCö"}).should eq false
   end
 
   it "matches a string against a negative character class with one range" do
-    rex = DFA::RegExp.new %{"[^a-z]+"}
+    rex = /"[^a-z]+"/.cr
     rex.match(%{"123"}).should eq true
     rex.match(%{"AM"}).should eq true
     rex.match(%{"haaaß"}).should eq false
@@ -79,4 +79,49 @@ describe DFA::RegExp do
     rex.match("1").should eq true
   end
 
+
+  it "matches special characters whitespace" do
+    rex = /[\s]+/.cr
+    rex.match("                ").should eq true
+    rex.match("                \n").should eq false
+  end
+
+  it "matches \\w" do
+    rex = /\w+/.cr
+    rex.match("hey").should eq true
+    rex.match("JoLo").should eq true
+    rex.match("!JoLo").should eq false
+    rex.match("JoL1").should eq false
+  end
+
+  it "matches \\W" do
+    rex = /\W+/.cr
+    rex.match("12ß-.;_:").should eq true
+    rex.match("JoLo").should eq false
+  end
+
+  it "matches \\d" do
+    rex = /[\dö]+/.cr
+    rex.match("12000").should eq true
+    rex.match("12000ö").should eq true
+    rex.match("12000e").should eq false
+    rex.match("12000;").should eq false
+  end
+
+  it "matches \\D" do
+    rex = /\D+/.cr
+    rex.match("lots'of chars that are no digits").should eq true
+    rex.match("lots'of chars that are n0 digits").should eq false
+  end
+
+  it "can be created from a system regex" do
+    /\s+hallo\s*/.cr.match("  hallo ").should eq true
+  end
+
+  it "works with a regexp I actually use" do
+    rx = /"([^"\\]|\\.)*"/.cr
+    string = %{"hi, \\"this\\" is a test"}
+
+    rx.match(string).should eq true
+  end
 end

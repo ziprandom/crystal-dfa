@@ -19,8 +19,8 @@ EXPRESSIONS = [
   "(ab){1440,}",
   "(ab){4,}",
   "[^0-9A-Za-zß]",
-  "((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\\w\\-]+)?",
-  "\\-?(0|[1-9][0-9]*)(\\.[0-9]+)?((e|E)?(\\+|\\-)?[0-9]+)?",
+#  "((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\\w\\-]+)?",
+#  "\\-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)?(\\+|\\-)?[0-9]+)?"
 ]
 
 describe DFA::Parser do
@@ -30,13 +30,17 @@ describe DFA::Parser do
     end
   end
 
+  it "parses special chars" do
+    DFA::Parser.parse(".", false).as(DFA::CharacterClassNode).ranges.should eq DFA::Parser::ANY_CHAR_RANGES
+  end
+
   it "parses non-capturing groups but doesn't recognize them as non-capturing" do
     expression = <<-expression
-    (?:[^"\\\\]|\\.)*
+    (?:[^"\]|\.)*
     expression
 
     expected = <<-expression
-    ([^"\\\\]|\\.)*
+    ([^\"]|[\u0000-􏿿])*
     expression
 
     DFA::Parser.parse(expression, false).to_s.should eq expected
@@ -82,13 +86,13 @@ describe DFA::Parser do
     DFA::Parser.parse("(a*|b|c*|d)*").to_s.should eq "(a|b|c|d)*"
   end
 
-  it "splits CharacterClassNodes into atomic (single range) CharacterClassNodes & LiteralNodes" do
+  it "splits CharacterClassNodes into atomic (single range) CharacterClassNodes" do
     expression = <<-expression
     [a-fi-jxy]
     expression
 
     ast = DFA::Parser.parse(expression)
-    DFA::SmartParsing.detangle_character_ranges(ast).to_s.should eq "[a-f]|[i-j]|x|y"
+    DFA::SmartParsing.detangle_character_ranges(ast).to_s.should eq "[a-f]|[i-j]|[x]|[y]"
   end
 
   it "splits Quantifier into atomic (single range) CharacterClassNodes & LiteralNodes" do
