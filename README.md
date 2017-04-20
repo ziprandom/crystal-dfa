@@ -11,26 +11,26 @@ Currently implemented Regex syntax:
 * character classes `[^a-bK-Lxyß]`
 * special character classes `.`, `\s`, `\t`, `\r`, `\d`, `\w`, `\W`, `\D`
 
-Performance still lacks behind PCRE slightly though :/
+Performance beats PCRE
 
 ```
 $ crystal run --release benchmark/compare.cr
 
 building "(?-imsx:(x+x+)+y)" with Regex (PCRE)
-  0.000000   0.000000   0.000000 (  0.000073)
+  0.000000   0.000000   0.000000 (  0.000160)
 building "(?-imsx:(x+x+)+y)" with RegExp (own impl
-  0.000000   0.000000   0.000000 (  0.000139)
+  0.000000   0.000000   0.000000 (  0.000259)
 
 matching "xxxxxxxxxxxxxy" a first time with Regex (PCRE)
   0.000000   0.000000   0.000000 (  0.000033)
 rx1.match(string) # => #<Regex::MatchData "xxxxxxxxxxxxxy" 1:"xxxxxxxxxxxxx">
 
 matching "xxxxxxxxxxxxxy" a first time with RegExp (own impl
-  0.000000   0.000000   0.000000 (  0.000021)
+  0.000000   0.000000   0.000000 (  0.000025)
 rx2.match(string) # => true
 
-     Regex (PCRE) matching : xxxxxxxxxxxxxy   2.03M (492.16ns) (± 5.69%)       fastest
-RegExp (own impl) matching : xxxxxxxxxxxxxy   1.49M (671.43ns) (± 2.51%)  1.36× slower
+     Regex (PCRE) matching : xxxxxxxxxxxxxy   2.19M (457.19ns) (± 5.67%)  2.17× slower
+RegExp (own impl) matching : xxxxxxxxxxxxxy   4.75M (210.56ns) (± 5.62%)       fastest
 ```
 
 ## Installation

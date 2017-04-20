@@ -4,15 +4,15 @@ module DFA
 
     extend NFA::ClassMethods
 
+    alias AtomType = Tuple(Int32, Int32)
+
     class DState
       getter :l, :next
       def initialize(
             @l : Array(NFA::State),
-            @next = Hash(AtomType, DState).new
+            @next = Array({AtomType, DState}).new
           ); end
     end
-
-    alias AtomType = Tuple(Int32, Int32)
 
     def self.match(start : NFA::State, string : String)
       dfa = fromNFA(symbols, start)
@@ -21,9 +21,9 @@ module DFA
 
     def self.match(dfa : DState, string : String)
       d = string.each_char.reduce(dfa) do |d, c|
-        k = d.next.each_key.find {|x| x[0] <= c.ord <= x[1] }
+        k = d.next.find {|x| x[0][0] <= c.ord <= x[0][1] }.try &.[1]
         break unless k
-        d.next[k]
+        k
       end
       return !!(d && d.l.any? &.c.== NFA::MATCH)
     end
@@ -50,7 +50,7 @@ module DFA
             states << next_state
           end
           IntersectionMethods.disjoin(s).sort_by(&.[0]).each do |segment|
-            state.next[segment] = next_state
+            state.next << {segment, next_state}
           end
         end
       end
