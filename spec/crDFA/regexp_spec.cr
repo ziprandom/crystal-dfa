@@ -2,9 +2,36 @@
 require "../spec_helper"
 
 describe DFA::RegExp do
+
+  it "matches a string against a very simple regex" do
+    rex = DFA::RegExp.new "[^a-z]"
+    rex.match("A").should eq true
+  end
+
+  it "matches a string against a very simple regex" do
+    rex = DFA::RegExp.new "[a-x]+"
+    rex.match("xasdasdwiueqhodiuhcoiuw").should eq true
+  end
+
+  it "matches a string against a very simple regex" do
+    rex = DFA::RegExp.new "a{2,4}"
+    rex.match("a").should eq false
+    rex.match("aa").should eq true
+    rex.match("aa").should eq true
+    rex.match("aaa").should eq true
+    rex.match("aaaa").should eq true
+    rex.match("aaaaa").should eq false
+  end
+
+  it "matches a string against a simple regex" do
+    rex = DFA::RegExp.new "ab"
+    rex.match("ab").should eq true
+  end
+
   it "matches a string against a simple regex" do
     rex = DFA::RegExp.new "x(a|b)+"
     rex.match("xaaabbbbaaab").should eq true
+    rex.match("xaaabbbbaaabc").should eq false
   end
 
   it "matches a string against a more complex regex" do
@@ -15,6 +42,15 @@ describe DFA::RegExp do
     rex.match(%{"haaaA"}).should eq false
     rex.match(%{"haaaa"}).should eq false
     rex.match(%{xxxxxxxxxxxxxxx}).should eq true
+  end
+
+  it "does stuff" do
+    rex = /[a-z]|x+|a{4}/.cr
+    rex.match(%{w}).should eq true
+    rex.match(%{xxxxxxxxxxxxxxx}).should eq true
+    rex.match(%{zz}).should eq false
+    rex.match(%{aaa}).should eq false
+    rex.match(%{aaaa}).should eq true
   end
 
   it "matches a string against a character class" do
@@ -69,6 +105,15 @@ describe DFA::RegExp do
     rex.match("ß").should eq true
   end
 
+  it "matches a string against a negative character class containing single literals" do
+    rex = /[^:\/\s]+/.cr
+    rex.match(":").should eq false
+    rex.match("/").should eq false
+    rex.match(" ").should eq false
+    rex.match("ssdfsdfhlkjhwedööü").should eq true
+    rex.match("ssdfsdfhlkjhwed ööü").should eq false
+  end
+
   it "matches a negative character class containing multiple ranges and single literals" do
     rex = DFA::RegExp.new "[^a-zA-Z35]"
     rex.match("g").should eq false
@@ -121,7 +166,12 @@ describe DFA::RegExp do
   it "works with a regexp I actually use" do
     rx = /"([^"\\]|\\.)*"/.cr
     string = %{"hi, \\"this\\" is a test"}
+    rx.match(string).should eq true
+  end
 
+  it "works with another regexp I actually use" do
+    rx = /((http[s]?|ftp):\/)\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?/.cr
+    string = "https://www.reddit.com/index.html"
     rx.match(string).should eq true
   end
 end

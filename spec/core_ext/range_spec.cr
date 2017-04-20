@@ -32,24 +32,30 @@ describe Range do
 
     it "disjoins two ranges" do
       a, b = 0..10, 5..15
-      a.disjoin(b).sort_by(&.begin).should eq [0..10, 11..15]
+      a.disjoin(b).sort_by(&.begin).should eq [0..4, 5..15]
     end
+
+    it "disjoins two ranges if which one is included in the other" do
+      a, b = 0..10, 5..7
+      a.disjoin(b).sort_by(&.begin).should eq [0..4, 5..7, 8..10]
+    end
+
   end
 
   describe ".disjoin" do
-
     a, b, c = 0..10, 5..15, 3..30
 
     it "disjoins an array of length one (aka. does nothing)" do
-      Range.disjoin([a]).should eq [a]
+      IntersectionMethods.disjoin([a]).should eq [a]
     end
 
     it "disjoins a tiny array of ranges removing any overlaps" do
-      Range.disjoin([a,b]).should eq [0..10, 11..15]
+      IntersectionMethods.disjoin([a,b]).sort_by(&.begin).should eq [0..4, 5..15]
     end
 
     it "disjoins an array of ranges removing any overlaps" do
-      Range.disjoin([a,b,c]).sort_by(&.begin).should eq [0..4, 5..15, 16..30]
+      # IntersectionMethods.disjoin([a,b,c]).sort_by(&.begin).should eq [0..2, 5..15, 16..30]
+      IntersectionMethods.disjoin([a,b,c]).sort_by(&.begin).should eq [0..2, 3..30]
     end
   end
 

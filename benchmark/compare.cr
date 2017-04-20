@@ -2,15 +2,20 @@ require "../src/crDFA"
 require "benchmark"
 
 rx1, rx2 = nil, nil
-expression = "(x+x+)+y"
+expression = /(x+x+)+y/
 string = "xxxxxxxxxxxxxy"
-
+#expression = /"([^"\\]|\\.)*"/
+#string = %{"hi, \\"this\\" is a test"}
+#expression = /(a?){10}a{10}/
+#string = "aaaaaaaaaa"
+#expression = /((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?/
+#string = "http://stackoverflow.com/questions/20767047/how-to-implement-regular-expression-nfa-with-character-ranges"
 puts
 puts %{building "#{expression}" with Regex (PCRE)}
-puts Benchmark.measure { rx1 = Regex.new(expression) }
+puts Benchmark.measure { rx1 = Regex.new(expression.source) }
 rx1 = rx1.not_nil!
 puts %{building "#{expression}" with RegExp (own impl}
-puts Benchmark.measure { rx2 = DFA::RegExp.new(expression) }
+puts Benchmark.measure { rx2 = rx1.cr }
 rx2 = rx2.not_nil!
 
 puts

@@ -1,6 +1,5 @@
 # coding: utf-8
 require "./traverse"
-
 # Constructing an NFA for our RegEx implementation
 # based on
 # https://swtch.com/~rsc/regexp/regexp1.html &
@@ -8,55 +7,70 @@ require "./traverse"
 #
 module DFA
   module NFA
-    include DFA::Traverse
+    include Traverse
+    module ClassMethods
 
-    MATCH = {256, 256}
-    SPLIT = {257, 257}
+      # Match State -> fin
+      private def matchstate
+        State.new(MATCH)
+      end
 
-    # Match State -> fin
-    def self.matchstate
-      State.new(MATCH)
+      private def add_state(list : Array(State), state : State, listid : Int32)
+        return unless state && state.lastlist != listid
+        state.lastlist = listid
+        if state.c == SPLIT
+          add_state(list, state.out.as(State), listid)
+          add_state(list, state.out1.as(State), listid)
+        else
+          list << state
+        end
+      end
+
+      private def step(clist, c, nlist, listid)
+        nlist.clear
+        i = 0
+        while i < clist.size
+          s = clist[i]
+          if intersect_segments(s.c, c)
+            add_state(nlist, s.out.as(NFA::State), listid)
+          end
+          i += 1
+        end
+        {clist, nlist}
+      end
+
+      private def intersect_segments(s1, s2)
+        min = s1[0] < s2[0]  ? s1 : s2
+        max = (min == s1) ? s2 : s1
+
+        if min[1] < max[0]
+          return nil
+        else
+          { max[0],
+            min[1] < max[1] ? min[1] : max[1] }
+        end
+      end
     end
 
+    extend ClassMethods
+
+    MATCH = {-1, -1}
+    SPLIT = {-2, -2}
+
     def self.match(start : State, string : String)
-      i, listid, clist, nlist, size = -1, 0, [] of State, [] of State, string.size
+      i, listid, clist, nlist, size, c = -1, 0, [] of State, [] of State, string.size, ' '
       add_state(clist, start.clone, listid)
       while (i += 1) < size
         c = string[i]
-        step(clist, c, nlist, listid += 1)
+        step(clist, {c.ord, c.ord}, nlist, listid += 1)
         t = clist; clist = nlist; nlist = t
       end
       clist.any? &.c.== MATCH
     end
 
-    def self.step(clist, c, nlist, listid)
-      nlist.clear
-      i = 0
-      while i < clist.size
-        s = clist[i]
-        o = c.ord
-        if s.c[0] <= o && o <= s.c[1]
-          add_state(nlist, s.out.as(State), listid)
-        end
-        i += 1
-      end
-      {clist, nlist}
-    end
-
-    def self.add_state(list : Array(State), state : State, listid : Int32)
-      return unless state && state.lastlist != listid
-      state.lastlist = listid
-      if state.c == SPLIT
-        add_state(list, state.out.as(State), listid)
-        add_state(list, state.out1.as(State), listid)
-      else
-        list << state
-      end
-    end
-
-    def self.create_nfa(ast : DFA::ASTNode)
+    def self.create_nfa(ast : ASTNode)
       nfa = Array(Fragment).new
-
+      symbols = Array(Tuple(Int32, Int32)).new
       # iterate the ast tree starting
       # from the leafs going up to the
       # wrapping nodes
@@ -94,13 +108,17 @@ module DFA
           end
         when LiteralNode
           ord = node.to_s[0].ord
-          state = State.new({ord, ord})
+          sym = {ord, ord}
+          symbols.push sym
+          state = State.new(sym)
           nfa.push Fragment.new state, [state.outp]
         # A CharacterClass Node is a Literalnode as we
         # store literal values as {begin, end} anyway
         when CharacterClassNode
           r = node.ranges.first
-          state = State.new({r.begin.ord, r.end.ord})
+          sym = {r.begin.ord, r.end.ord}
+          symbols.push sym
+          state = State.new(sym)
           nfa.push Fragment.new state, [state.outp]
         end
         nil
@@ -116,22 +134,22 @@ module DFA
 
       def clone(references : Hash(UInt64, State) = Hash(UInt64, State).new)
         if references[self.object_id]?
-          return references[self.object_id]
-        else
-          n = State.allocate
-          n.c = c
-          references[self.object_id] = n
-          n.out = out ? out.as(State).clone(references) : nil
-          n.out1 = out1 ? out1.as(State).clone(references) : nil
-          n
+             return references[self.object_id]
+           else
+             n = State.allocate
+             n.c = c
+             references[self.object_id] = n
+             n.out = out ? out.as(State).clone(references) : nil
+             n.out1 = out1 ? out1.as(State).clone(references) : nil
+             n
         end
       end
 
       def initialize(
-                     @c : {Int32, Int32}, # segments to represent a character
-      # a => {97,97}, [a-z] => {97, 122}
-                     @out : State? = nil, @out1 : State? = nil,
-                     @lastlist : Int32? = nil); end
+            @c : {Int32, Int32}, # segments to represent a character
+            # a => {97,97}, [a-z] => {97, 122}
+            @out : State? = nil, @out1 : State? = nil,
+            @lastlist : Int32? = nil); end
 
       def outp
         pointerof(@out)
@@ -140,6 +158,11 @@ module DFA
       def outp1
         pointerof(@out1)
       end
+
+      def <=>(other)
+        object_id <=> other.object_id
+      end
+
     end
 
     class Fragment

@@ -3,25 +3,31 @@ require "./smart_parsing"
 
 module DFA
   class RegExp
-    getter :nfa
-    @nfa : DFA::NFA::State
+
+    getter :nfa, :dfa
+
+    @nfa : NFA::State
+    @dfa : DFA::DState
 
     def initialize(expression : String)
-      @nfa = DFA::NFA.create_nfa(
-        DFA::SmartParsing.flatten_out_quantifications(
-          DFA::SmartParsing.detangle_character_ranges(
-            DFA::Parser.parse(expression)
+      @nfa = NFA.create_nfa(
+        SmartParsing.flatten_out_quantifications(
+          SmartParsing.detangle_character_ranges(
+            Parser.parse(expression)
           )
         )
       )
+      @dfa = DFA.fromNFA @nfa
     end
 
     def =~(string)
       match(string)
     end
 
-    def match(string)
-      DFA::NFA.match(@nfa, string)
+    def match(string, use_dfa = true)
+      use_dfa ?
+        DFA.match(@dfa, string) :
+        NFA.match(@nfa, string)
     end
   end
 end

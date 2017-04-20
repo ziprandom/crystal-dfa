@@ -11,7 +11,7 @@ module DFA
     def self.parse(string, optimize = true)
       ast = self.new.parse(string)
       if ast && optimize
-        DFA::SmartParsing.optimize(ast).not_nil!
+        SmartParsing.optimize(ast).not_nil!
       else
         ast
       end
@@ -82,14 +82,14 @@ module DFA
 
     def self.make_special_node(string)
       ranges = case string
-               when "s" then DFA::LiteralNode.new(WHITESPACE_RANGES.first.begin)
-               when "t" then DFA::LiteralNode.new(TAB_RANGES.first.begin)
-               when "r" then DFA::LiteralNode.new(CR_RANGES.first.begin)
-               when "w" then DFA::CharacterClassNode.new(false, Array(String).new, WORD_RANGES)
-               when "W" then DFA::CharacterClassNode.new(true, Array(String).new, WORD_RANGES)
-               when "d" then DFA::CharacterClassNode.new(false, Array(String).new, DIGIT_RANGES)
-               when "D" then DFA::CharacterClassNode.new(true, Array(String).new, DIGIT_RANGES)
-               else DFA::CharacterClassNode.new(false, Array(String).new, ANY_CHAR_RANGES)
+               when "s" then LiteralNode.new(WHITESPACE_RANGES.first.begin)
+               when "t" then LiteralNode.new(TAB_RANGES.first.begin)
+               when "r" then LiteralNode.new(CR_RANGES.first.begin)
+               when "w" then CharacterClassNode.new(false, Array(String).new, WORD_RANGES)
+               when "W" then CharacterClassNode.new(true, Array(String).new, WORD_RANGES)
+               when "d" then CharacterClassNode.new(false, Array(String).new, DIGIT_RANGES)
+               when "D" then CharacterClassNode.new(true, Array(String).new, DIGIT_RANGES)
+               else CharacterClassNode.new(false, Array(String).new, ANY_CHAR_RANGES)
                end
     end
 
