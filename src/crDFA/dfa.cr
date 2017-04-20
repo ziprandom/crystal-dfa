@@ -21,7 +21,7 @@ module DFA
 
     def self.match(dfa : DState, string : String)
       d = string.each_char.reduce(dfa) do |d, c|
-        k = d.next.keys.find {|x| x[0] <= c.ord <= x[1] }
+        k = d.next.each_key.find {|x| x[0] <= c.ord <= x[1] }
         break unless k
         d.next[k]
       end
