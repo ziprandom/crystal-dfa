@@ -21,9 +21,8 @@ module DFA
 
     def self.match(dfa : DState, string : String)
       d = string.each_char.reduce(dfa) do |d, c|
-        k = d.next.find {|x| x[0][0] <= c.ord <= x[0][1] }.try &.[1]
-        break unless k
-        k
+        break unless d
+        d.next.find {|x| x[0][0] <= c.ord <= x[0][1] }.try &.[1]
       end
       return !!(d && d.l.any? &.c.== NFA::MATCH)
     end
