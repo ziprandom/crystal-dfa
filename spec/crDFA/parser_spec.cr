@@ -31,7 +31,7 @@ describe DFA::Parser do
   end
 
   it "parses special chars" do
-    DFA::Parser.parse(".", false).as(DFA::CharacterClassNode).ranges.should eq DFA::Parser::ANY_CHAR_RANGES
+    DFA::Parser.parse(".", false).as(DFA::AST::CharacterClassNode).ranges.should eq DFA::Parser::ANY_CHAR_RANGES
   end
 
   it "parses non-capturing groups but doesn't recognize them as non-capturing" do

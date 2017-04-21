@@ -8,23 +8,23 @@ module DFA
   module SmartParsing
     include Traverse
 
-    def self.optimize(tree : ASTNode)
+    def self.optimize(tree : AST::ASTNode)
       optimize_combined(tree)
     end
 
     def self.detangle_character_ranges(tree)
       visit(tree) do |node|
         case node
-        when CharacterClassNode
+        when AST::CharacterClassNode
           c_ranges = node.characters.map { |c| (c[0]..c[0]) }
           all_ranges = IntersectionMethods.disjoin(c_ranges + node.ranges).sort_by(&.begin)
 
-          if node.as(CharacterClassNode).negate
+          if node.as(AST::CharacterClassNode).negate
             all_ranges = invert_disjunct_character_range_sets(all_ranges)
           end
 
-          options = all_ranges.map { |r| CharacterClassNode.new(false, [] of String, [r]).as(ASTNode) }
-          options.size > 1 ? AlternationNode.new(options) :
+          options = all_ranges.map { |r| AST::CharacterClassNode.new(false, [] of String, [r]).as(AST::ASTNode) }
+          options.size > 1 ? AST::AlternationNode.new(options) :
             options.first
         end
       end
@@ -48,20 +48,20 @@ module DFA
     def self.flatten_out_quantifications(tree)
       visit(tree) do |node|
         case node
-        when QuantifierNode
+        when AST::QuantifierNode
           min, max, exact = node.min, node.max, node.exact
-          cnode = node.as(QuantifierNode)
+          cnode = node.as(AST::QuantifierNode)
           if exact && exact > 0
             c = exact.times.to_a.map { cnode.tree }
-            ConcatNode.new c.not_nil!
+            AST::ConcatNode.new c.not_nil!
           elsif min && min > 0 && max && max > 0
-            ConcatNode.new(
+            AST::ConcatNode.new(
               min.times.to_a.map { cnode.tree }.not_nil! +
-              (max - min).times.to_a.map { QSTMNode.new(cnode.tree) }
+              (max - min).times.to_a.map { AST::QSTMNode.new(cnode.tree) }
             )
           elsif min && min > 0
-            ConcatNode.new(
-              (min > 1 ? (min - 1).times.to_a.map { cnode.tree }.not_nil! : [] of ASTNode) << PlusNode.new cnode.tree
+            AST::ConcatNode.new(
+              (min > 1 ? (min - 1).times.to_a.map { cnode.tree }.not_nil! : [] of AST::ASTNode) << AST::PlusNode.new cnode.tree
             )
           end
         end
@@ -71,29 +71,29 @@ module DFA
     def self.optimize_combined(tree)
       visit(tree) do |node|
         case node
-        when GroupNode
+        when AST::GroupNode
           # (A) => A
           node.tree
-        when StarNode
+        when AST::StarNode
           case node.tree
-          when StarNode
+          when AST::StarNode
             # A** => A*
             node.tree
-          when AlternationNode
+          when AST::AlternationNode
             # (A*|B*)* => (A|B)*
             # (A*|B)* => (A|B)*
-            ntree = node.tree.as(AlternationNode)
-            if ntree.alternatives.any?(&.is_a? StarNode)
-              StarNode.new AlternationNode.new(
-                ntree.alternatives.map { |a| a.is_a?(StarNode) ? a.tree : a }
+            ntree = node.tree.as(AST::AlternationNode)
+            if ntree.alternatives.any?(&.is_a? AST::StarNode)
+              AST::StarNode.new AST::AlternationNode.new(
+                ntree.alternatives.map { |a| a.is_a?(AST::StarNode) ? a.tree : a }
               )
             end
-          when ConcatNode
-            ntree = node.tree.as(ConcatNode)
-            if ntree.nodes.all?(&.is_a? StarNode)
+          when AST::ConcatNode
+            ntree = node.tree.as(AST::ConcatNode)
+            if ntree.nodes.all?(&.is_a? AST::StarNode)
               # (A*B*)* => (A|B)*
-              StarNode.new AlternationNode.new(
-                ntree.nodes.map &.as(StarNode).tree
+              AST::StarNode.new AST::AlternationNode.new(
+                ntree.nodes.map &.as(AST::StarNode).tree
               )
             end
           end

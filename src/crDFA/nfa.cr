@@ -68,7 +68,7 @@ module DFA
       clist.any? &.c.== MATCH
     end
 
-    def self.create_nfa(ast : ASTNode)
+    def self.create_nfa(ast : AST::ASTNode)
       nfa = Array(Fragment).new
       symbols = Array(Tuple(Int32, Int32)).new
       # iterate the ast tree starting
@@ -76,37 +76,37 @@ module DFA
       # wrapping nodes
       visit(ast) do |node|
         case node
-        when QuantifierNode
-        when PlusNode
+        when AST::QuantifierNode
+        when AST::PlusNode
           e1 = nfa.pop
           state = State.new(SPLIT, e1.start)
           patch(e1.out, state)
           nfa.push Fragment.new e1.start, [state.outp1]
-        when StarNode
+        when AST::StarNode
           e1 = nfa.pop
           state = State.new(SPLIT)
           state.out = e1.start
           patch(e1.out, state)
           nfa.push Fragment.new state, [state.outp1]
-        when QSTMNode
+        when AST::QSTMNode
           e = nfa.pop
           state = State.allocate.tap { |s| s.c = SPLIT; s.out = e.start }
           nfa.push Fragment.new(state, e.out + [state.outp1])
-        when AlternationNode
+        when AST::AlternationNode
           (node.alternatives.size - 1).times do
             e2 = nfa.pop
             e1 = nfa.pop
             state = State.new(SPLIT, e1.start, e2.start)
             nfa.push Fragment.new state, e1.out + e2.out
           end
-        when ConcatNode
+        when AST::ConcatNode
           (node.nodes.size - 1).times do
             e2 = nfa.pop
             e1 = nfa.pop
             patch(e1.out, e2.start)
             nfa.push Fragment.new e1.start, e2.out
           end
-        when LiteralNode
+        when AST::LiteralNode
           ord = node.to_s[0].ord
           sym = {ord, ord}
           symbols.push sym
@@ -114,7 +114,7 @@ module DFA
           nfa.push Fragment.new state, [state.outp]
         # A CharacterClass Node is a Literalnode as we
         # store literal values as {begin, end} anyway
-        when CharacterClassNode
+        when AST::CharacterClassNode
           r = node.ranges.first
           sym = {r.begin.ord, r.end.ord}
           symbols.push sym

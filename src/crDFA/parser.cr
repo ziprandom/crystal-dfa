@@ -6,7 +6,7 @@ module DFA
   class Parser
     @group_start_stack = Array(Int32).new
     @character_group_stack = Array(Int32).new
-    @ast : Array(ASTNode) = Array(ASTNode).new
+    @ast : Array(AST::ASTNode) = Array(AST::ASTNode).new
 
     def self.parse(string, optimize = true)
       ast = self.new.parse(string)
@@ -41,32 +41,32 @@ module DFA
             set_current_scope_ast(consumeLastOrAlternative(current_scope_ast))
             oring = false
           end
-          @ast = @ast.shift(@group_start_stack.pop) << GroupNode.new(@ast.size > 1 ? ConcatNode.new(@ast) : @ast.first)
+          @ast = @ast.shift(@group_start_stack.pop) << AST::GroupNode.new(@ast.size > 1 ? AST::ConcatNode.new(@ast) : @ast.first)
         when :ALPHANUM, :MINUS
           value = token[1]
-          @ast << LiteralNode.new(value[0])
-        when :STAR then @ast << StarNode.new(@ast.pop)
-        when :PLUS then @ast << PlusNode.new(@ast.pop)
-        when :QSTM then @ast << QSTMNode.new(@ast.pop)
+          @ast << AST::LiteralNode.new(value[0])
+        when :STAR then @ast << AST::StarNode.new(@ast.pop)
+        when :PLUS then @ast << AST::PlusNode.new(@ast.pop)
+        when :QSTM then @ast << AST::QSTMNode.new(@ast.pop)
         when :SPECIAL then @ast << self.class.make_special_node(token[1])
         when :LCURLY
           skip, exact, min, max = parse_quantification(index, tokens)
-          @ast << QuantifierNode.new(@ast.pop, exact, min, max)
+          @ast << AST::QuantifierNode.new(@ast.pop, exact, min, max)
         when :PIPE
           if oring
             set_current_scope_ast(consumeLastOrAlternative(current_scope_ast))
           else
-            cast = current_scope_ast.size > 1 ? ConcatNode.new(current_scope_ast) : current_scope_ast.first
-            anode = AlternationNode.new([cast])
+            cast = current_scope_ast.size > 1 ? AST::ConcatNode.new(current_scope_ast) : current_scope_ast.first
+            anode = AST::AlternationNode.new([cast])
             oring = true
-            set_current_scope_ast([anode.as(ASTNode)])
+            set_current_scope_ast([anode.as(AST::ASTNode)])
           end
         end
       end
       if oring
         set_current_scope_ast(consumeLastOrAlternative(current_scope_ast))
       end
-      @ast.size > 1 ? ConcatNode.new(@ast) : @ast.first
+      @ast.size > 1 ? AST::ConcatNode.new(@ast) : @ast.first
     end
 
 
@@ -82,14 +82,14 @@ module DFA
 
     def self.make_special_node(string)
       ranges = case string
-               when "s" then LiteralNode.new(WHITESPACE_RANGES.first.begin)
-               when "t" then LiteralNode.new(TAB_RANGES.first.begin)
-               when "r" then LiteralNode.new(CR_RANGES.first.begin)
-               when "w" then CharacterClassNode.new(false, Array(String).new, WORD_RANGES)
-               when "W" then CharacterClassNode.new(true, Array(String).new, WORD_RANGES)
-               when "d" then CharacterClassNode.new(false, Array(String).new, DIGIT_RANGES)
-               when "D" then CharacterClassNode.new(true, Array(String).new, DIGIT_RANGES)
-               else CharacterClassNode.new(false, Array(String).new, ANY_CHAR_RANGES)
+               when "s" then AST::LiteralNode.new(WHITESPACE_RANGES.first.begin)
+               when "t" then AST::LiteralNode.new(TAB_RANGES.first.begin)
+               when "r" then AST::LiteralNode.new(CR_RANGES.first.begin)
+               when "w" then AST::CharacterClassNode.new(false, Array(String).new, WORD_RANGES)
+               when "W" then AST::CharacterClassNode.new(true, Array(String).new, WORD_RANGES)
+               when "d" then AST::CharacterClassNode.new(false, Array(String).new, DIGIT_RANGES)
+               when "D" then AST::CharacterClassNode.new(true, Array(String).new, DIGIT_RANGES)
+               else AST::CharacterClassNode.new(false, Array(String).new, ANY_CHAR_RANGES)
                end
     end
 
@@ -101,16 +101,16 @@ module DFA
     def set_current_scope_ast(ast)
       if @group_start_stack.size > 0
         prev_ast = @ast.shift(@group_start_stack.last)
-        @ast = prev_ast.as(Array(ASTNode)) + ast.as(Array(ASTNode))
+        @ast = prev_ast.as(Array(AST::ASTNode)) + ast.as(Array(AST::ASTNode))
       else
         @ast = ast
       end
     end
 
     private def consumeLastOrAlternative(ast)
-      anode = ast.shift.as(AlternationNode)
-      anode.alternatives << (ast.size > 1 ? ConcatNode.new(ast) : ast.first).as(ASTNode)
-      [anode.as(ASTNode)]
+      anode = ast.shift.as(AST::AlternationNode)
+      anode.alternatives << (ast.size > 1 ? AST::ConcatNode.new(ast) : ast.first).as(AST::ASTNode)
+      [anode.as(AST::ASTNode)]
     end
 
     private def parse_character_class(tokens, string)
@@ -147,7 +147,7 @@ module DFA
           break
         end
       end
-      node = CharacterClassNode.new(negate, characters, ranges)
+      node = AST::CharacterClassNode.new(negate, characters, ranges)
       node.source = "[" + string[tokens[0][2]..tokens[index][2]]
       {index, node}
     end
