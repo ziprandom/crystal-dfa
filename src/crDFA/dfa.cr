@@ -27,18 +27,17 @@ module DFA
       self.match(dfa, string)
     end
 
-    def self.match(dfa : DState, string : String)
+    def self.match(dfa : DState, string : String, full_match = false)
       match_end, d = -1, dfa
       string.each_char_with_index do | c, i |
         break unless d
         d = d.next.find {|x| x[0][0] <= c.ord <= x[0][1] }.try &.[1]
         match_end = i+1 if d && d.accept
       end
-      if match_end > 0
-        return MatchData.new(string[0, match_end])
-      else
-        nil
-      end
+      full_match ?
+        (d.try &.accept ?
+           MatchData.new(string) : nil) :
+        (match_end > 0 ? MatchData.new(string[0, match_end]) : nil)
     end
 
     def self.fromNFA(start : NFA::State)
@@ -66,6 +65,7 @@ module DFA
             state.next << {segment, next_state}
           end
         end
+        state.next.sort_by! &.[0][0]
       end
       startd
     end

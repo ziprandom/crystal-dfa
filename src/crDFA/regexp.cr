@@ -24,9 +24,9 @@ module DFA
       match(string)
     end
 
-    def match(string, use_dfa = true)
+    def match(string, use_dfa = true, full_match = true)
       use_dfa ?
-        DFA.match(@dfa, string) :
+        DFA.match(@dfa, string, full_match) :
         NFA.match(@nfa, string)
     end
   end
