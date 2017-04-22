@@ -17,20 +17,21 @@ Performance beats PCRE
 $ crystal run --release benchmark/compare.cr
 
 building "(?-imsx:(?:x+x+)+y)" with Regex (PCRE)
-  0.000000   0.000000   0.000000 (  0.000143)
+  0.000000   0.000000   0.000000 (  0.000111)
 building "(?-imsx:(?:x+x+)+y)" with RegExp (own impl
-  0.000000   0.000000   0.000000 (  0.000249)
+  0.000000   0.000000   0.000000 (  0.000205)
 
 matching "xxxxxxxxxxxxxy" a first time with Regex (PCRE)
-  0.000000   0.000000   0.000000 (  0.000065)
+  0.000000   0.000000   0.000000 (  0.000035)
 rx1.match(string) # => #<Regex::MatchData "xxxxxxxxxxxxxy">
 
 matching "xxxxxxxxxxxxxy" a first time with RegExp (own impl
-  0.000000   0.000000   0.000000 (  0.000036)
-rx2.match(string) # => true
+  0.000000   0.000000   0.000000 (  0.000027)
+rx2.match(string) # => #<DFA::DFA::MatchData:0x55adf4afcd00
+                        @match="xxxxxxxxxxxxxy">
 
-     Regex (PCRE) matching : xxxxxxxxxxxxxy   2.46M (406.14ns) (± 7.03%)  2.09× slower
-RegExp (own impl) matching : xxxxxxxxxxxxxy   5.14M (194.52ns) (± 6.78%)       fastest
+     Regex (PCRE) matching : xxxxxxxxxxxxxy   2.25M (443.56ns) (± 8.61%)  3.92× slower
+RegExp (own impl) matching : xxxxxxxxxxxxxy   8.83M (113.24ns) (±11.62%)       fastest
 ```
 
 ## Installation
