@@ -7,11 +7,19 @@ module DFA
     alias AtomType = Tuple(Int32, Int32)
 
     class DState
-      getter :l, :next
+      getter :l, :next, :accept
+      @accept = false
       def initialize(
             @l : Array(NFA::State),
             @next = Array({AtomType, DState}).new
-          ); end
+          )
+        @accept = @l.any? &.c.== NFA::MATCH
+      end
+    end
+
+    class MatchData
+      getter :match
+      def initialize(@match : String); end
     end
 
     def self.match(start : NFA::State, string : String)
@@ -20,11 +28,17 @@ module DFA
     end
 
     def self.match(dfa : DState, string : String)
-      d = string.each_char.reduce(dfa) do |d, c|
+      match_end, d = -1, dfa
+      string.each_char_with_index do | c, i |
         break unless d
-        d.next.find {|x| x[0][0] <= c.ord <= x[0][1] }.try &.[1]
+        d = d.next.find {|x| x[0][0] <= c.ord <= x[0][1] }.try &.[1]
+        match_end = i+1 if d && d.accept
       end
-      return !!(d && d.l.any? &.c.== NFA::MATCH)
+      if match_end > 0
+        return MatchData.new(string[0, match_end])
+      else
+        nil
+      end
     end
 
     def self.fromNFA(start : NFA::State)
