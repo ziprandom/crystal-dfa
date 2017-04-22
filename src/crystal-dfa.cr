@@ -1,5 +1,5 @@
 require "./core_ext/*"
-require "./crDFA/**"
+require "./crystal-dfa/**"
 
 #
 # Lets use crystals convenient /.../

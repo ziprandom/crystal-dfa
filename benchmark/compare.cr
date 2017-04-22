@@ -1,4 +1,4 @@
-require "../src/crDFA"
+require "../src/crystal-dfa"
 require "benchmark"
 
 rx1, rx2 = nil, nil
