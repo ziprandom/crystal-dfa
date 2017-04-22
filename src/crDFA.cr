@@ -52,7 +52,3 @@ module DFA
     end
   end
 end
-
-def char_cmp(mc : Char)
-  ->(c : Char) { c == mc }
-end
