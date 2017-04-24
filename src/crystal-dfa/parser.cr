@@ -42,7 +42,7 @@ module DFA
             oring = false
           end
           @ast = @ast.shift(@group_start_stack.pop) << AST::GroupNode.new(@ast.size > 1 ? AST::ConcatNode.new(@ast) : @ast.first)
-        when :ALPHANUM, :MINUS
+        when :ALPHANUM, :MINUS, :COMMA
           value = token[1]
           @ast << AST::LiteralNode.new(value[0])
         when :STAR then @ast << AST::StarNode.new(@ast.pop)
