@@ -48,6 +48,22 @@ dependencies:
 
 ```crystal
 require "crystal-dfa"
+
+rex = DFA::RegExp.new "(crystal|ruby) (just )?looks like (crystal|ruby)"
+
+rex.match("crystal just looks like ruby!") # => #<DFA::DFA::MatchData:0x556758a89d00
+                                           #     @match=
+                                           #      "crystal just looks like ruby!">
+
+rex.match("ruby looks like crystal!") # => #<DFA::DFA::MatchData:0x556758a89aa0
+                                      #     @match=
+                                      #      "ruby looks like crystal!">
+
+rex.match("python just looks like crystal!") # => nil
+
+rex.match("crystal-lang !!", true, false) # => #<DFA::DFA::MatchData:0x556758a8e3a0
+                                          #     @match=
+                                          #      "crystal">
 ```
 
 ## Contributing
