@@ -205,8 +205,16 @@ module DFA
                   when "\\"
                     index += 1
                     case s = string[index].to_s
-                    when "s", "t", "r", "w", "W", "d", "D"
+                    when "s", "w", "W", "d", "D"
                       {:SPECIAL, s, index-1}
+                    when "n"
+                      {:ALPHANUM, "\n", index}
+                    when "t"
+                      {:ALPHANUM, "\t", index}
+                    when "c"
+                      {:ALPHANUM, "\c", index}
+                    when "r"
+                      {:ALPHANUM, "\r", index}
                     else
                       {:ALPHANUM, "#{s}", index - 1}
                     end

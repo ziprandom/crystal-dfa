@@ -131,6 +131,12 @@ describe DFA::RegExp do
     rex.match("                \n").should be_falsey
   end
 
+  it "matches \\n" do
+    rex = /[\n]+/.cr
+    rex.match("\n\n\n").should be_truthy
+    rex.match("\n\n_\n").should be_falsey
+  end
+
   it "matches \\w" do
     rex = /\w+/.cr
     rex.match("hey").should be_truthy
