@@ -49,7 +49,7 @@ dependencies:
 ```crystal
 require "crystal-dfa"
 
-rex = DFA::RegExp.new "(crystal|ruby) (just )?looks like (crystal|ruby)"
+rex = DFA::RegExp.new "(crystal|ruby) (just )?looks like (crystal|ruby)!"
 
 rex.match("crystal just looks like ruby!") # => #<DFA::DFA::MatchData:0x556758a89d00
                                            #     @match=
