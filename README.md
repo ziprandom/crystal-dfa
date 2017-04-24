@@ -1,6 +1,8 @@
 # crystal-dfa
 
-A Regex syntax parser, and Thompson NFA to DFA transformer and matcher based on Russ Cox's article ["Regular Expression Matching Can Be Simple And Fast"](https://swtch.com/~rsc/regexp/regexp1.html) with parse tree simplifications from Guangming Xings paper [Minimized Thompson NFA - Chapter 3](http://people.wku.edu/guangming.xing/thompsonnfa.pdf). It is used in the new [lexer implementation](https://ziprandom.github.io/cltk/CLTK/Scanner.html) for the [crystal language toolkit](https://github.com/ziprandom/cltk)'s to improve the performance of the lexer.
+A Regex syntax parser, and Thompson NFA to DFA transformer and matcher based on Russ Cox's article ["Regular Expression Matching Can Be Simple And Fast"](https://swtch.com/~rsc/regexp/regexp1.html) with parse tree simplifications from Guangming Xings paper [Minimized Thompson NFA - Chapter 3](http://people.wku.edu/guangming.xing/thompsonnfa.pdf).
+
+It is used in [Scanner](https://ziprandom.github.io/cltk/CLTK/Scanner.html) the new lexer implementation of the [Crystal Language Toolkit](https://github.com/ziprandom/cltk) to improve the lexing performance.
 
 Currently implemented Regex syntax:
 
