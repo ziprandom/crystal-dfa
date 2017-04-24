@@ -61,6 +61,8 @@ rex.match("ruby looks like crystal!") # => #<DFA::DFA::MatchData:0x556758a89aa0
 
 rex.match("python just looks like crystal!") # => nil
 
+rex = DFA::RegExp.new "crystal"
+
 rex.match("crystal-lang !!", true, false) # => #<DFA::DFA::MatchData:0x556758a8e3a0
                                           #     @match=
                                           #      "crystal">
