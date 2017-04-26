@@ -6,7 +6,7 @@ module DFA
 
     alias AtomType = Tuple(Int32, Int32)
 
-    class DState
+    struct DState
       getter :l, :next, :accept
       @accept = false
       def initialize(
