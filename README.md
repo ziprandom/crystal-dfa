@@ -1,4 +1,4 @@
-# crystal-dfa
+# crystal-dfa [![Build Status](https://api.travis-ci.org/ziprandom/crystal-dfa.svg)](https://travis-ci.org/ziprandom/crystal-dfa)
 
 A Regex syntax parser, and Thompson NFA to DFA transformer and matcher based on Russ Cox's article ["Regular Expression Matching Can Be Simple And Fast"](https://swtch.com/~rsc/regexp/regexp1.html) with parse tree simplifications from Guangming Xings paper [Minimized Thompson NFA - Chapter 3](http://people.wku.edu/guangming.xing/thompsonnfa.pdf).
 
