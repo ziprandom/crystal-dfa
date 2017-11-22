@@ -18,9 +18,19 @@ EXPRESSIONS = [
   "(ab){1440}",
   "(ab){1440,}",
   "(ab){4,}",
-  "[^0-9A-Za-zß]",
+  "[^0-9A-Za-zß]"
 #  "((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\\w\\-]+)?",
 #  "\\-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)?(\\+|\\-)?[0-9]+)?"
+]
+
+INVALID_EXPRESSIONS = [
+  "*",
+  "(",
+  "[)",
+  "a(a[])",
+  "()",
+  "a*[*]",
+  "(?hallo)"
 ]
 
 describe DFA::Parser do
@@ -28,6 +38,10 @@ describe DFA::Parser do
     it "parses #{exp}" do
       DFA::Parser.parse(exp, false).to_s.should eq exp
     end
+  end
+
+  it "parses an alteration with a(n ignored) non-capturing group" do
+    DFA::Parser.parse("b|(?:a)").to_s == "b|(a)"
   end
 
   it "parses special chars" do
@@ -105,4 +119,13 @@ describe DFA::Parser do
     ast = DFA::Parser.parse(expression)
     DFA::SmartParsing.flatten_out_quantifications(ast).to_s.should eq expected
   end
+
+  INVALID_EXPRESSIONS.each do |exp|
+    it "raises ParseException for `#{exp}`" do
+      expect_raises(DFA::Parser::ParseException) do
+        DFA::Parser.parse(exp, false)
+      end
+    end
+  end
+
 end

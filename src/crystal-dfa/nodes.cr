@@ -3,6 +3,8 @@ module DFA
     class ASTNode; end
 
     class LiteralNode < ASTNode
+      getter :value
+
       def initialize(@value : Char); end
 
       def to_s
@@ -82,6 +84,11 @@ module DFA
       end
     end
 
+    class CharacterRangeNode < ASTNode
+      getter :from, :to
+      def initialize(@from : Char, @to : Char); end
+    end
+
     class CharacterClassNode < ASTNode
       setter :source
       getter :negate, :ranges, :characters
@@ -89,7 +96,11 @@ module DFA
       def initialize(
             @negate : Bool, @characters : Array(String),
             @ranges : Array(Range(Char, Char)),
-            @source : String = ""); end
+            @source : String = "")
+        unless @characters.size > 0 || @ranges.size > 0
+          raise "empty character class!"
+        end
+      end
 
       def to_s
         r_to_s = @ranges.sort_by(&.begin).map do |r|
