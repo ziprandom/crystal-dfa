@@ -111,7 +111,7 @@ module DFA
     def consume(_type : Symbol)
       _next = consume
       unless _next && _next[:type] == _type
-        raise "expected `#{Lexer::IDENTIFIERS.key?(_type)||_type}` got `#{_next}`"
+        raise "expected `#{Lexer::IDENTIFIERS.key_for?(_type)||_type}` got `#{_next}`"
       end
       _next
     end
@@ -168,7 +168,7 @@ module DFA
                   # their string representation because
                   # we won't interprete them inside a
                   # characterclass
-                  Lexer::IDENTIFIERS.key(_next[:type])
+                  Lexer::IDENTIFIERS.key_for(_next[:type])
 
         case value
         when 's' then AST::LiteralNode.new(WHITESPACE_RANGES.first.begin)
