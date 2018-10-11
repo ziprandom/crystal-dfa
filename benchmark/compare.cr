@@ -4,12 +4,12 @@ require "benchmark"
 rx1, rx2 = nil, nil
 expression = /(?:x+x+)+y/
 string = "xxxxxxxxxxxxxy"
-#expression = /"([^"\\]|\\.)*"/
-#string = %{"hi, \\"this\\" is a test"}
-#expression = /(a?){10}a{10}/
-#string = "aaaaaaaaaa"
-#expression = /(?:(?:http[s]?|ftp):\/)?\/?(?:[^:\/\s]+)(?:(?:\/\w+)*\/)(?:[\w\-\.]+[^#?\s]+)(?:.*)?(?:#[\w\-]+)?/
-#string = "http://stackoverflow.com/questions/20767047/how-to-implement-regular-expression-nfa-with-character-ranges"
+# expression = /"([^"\\]|\\.)*"/
+# string = %{"hi, \\"this\\" is a test"}
+# expression = /(a?){10}a{10}/
+# string = "aaaaaaaaaa"
+# expression = /(?:(?:http[s]?|ftp):\/)?\/?(?:[^:\/\s]+)(?:(?:\/\w+)*\/)(?:[\w\-\.]+[^#?\s]+)(?:.*)?(?:#[\w\-]+)?/
+# string = "http://stackoverflow.com/questions/20767047/how-to-implement-regular-expression-nfa-with-character-ranges"
 puts
 puts %{building "#{expression}" with Regex (PCRE)}
 puts Benchmark.measure { rx1 = Regex.new(expression.source) }

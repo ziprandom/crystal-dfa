@@ -3,7 +3,6 @@ require "./smart_parsing"
 
 module DFA
   class RegExp
-
     getter :nfa, :dfa
 
     @nfa : NFA::State
@@ -25,9 +24,7 @@ module DFA
     end
 
     def match(string, use_dfa = true, full_match = true)
-      use_dfa ?
-        DFA.match(@dfa, string, full_match) :
-        NFA.match(@nfa, string)
+      use_dfa ? DFA.match(@dfa, string, full_match) : NFA.match(@nfa, string)
     end
   end
 end

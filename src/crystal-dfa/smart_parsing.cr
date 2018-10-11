@@ -24,8 +24,7 @@ module DFA
           end
 
           options = all_ranges.map { |r| AST::CharacterClassNode.new(false, [] of String, [r]).as(AST::ASTNode) }
-          options.size > 1 ? AST::AlternationNode.new(options) :
-            options.first
+          options.size > 1 ? AST::AlternationNode.new(options) : options.first
         end
       end
     end
@@ -33,15 +32,15 @@ module DFA
     private def self.invert_disjunct_character_range_sets(ranges)
       ranges.map_with_index do |r, index|
         case index
-        when 0 then
+        when 0
           (0.unsafe_chr..r.begin.pred)
         else
-          prev = ranges[index-1]
+          prev = ranges[index - 1]
           next if prev.end.succ == r.begin
           (prev.end.succ..r.begin.pred)
         end.as(Range(Char, Char)?)
       end.compact.flatten + [
-        (ranges.last.end.succ..Char::MAX_CODEPOINT.unsafe_chr)
+        (ranges.last.end.succ..Char::MAX_CODEPOINT.unsafe_chr),
       ]
     end
 
