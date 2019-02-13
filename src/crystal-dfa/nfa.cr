@@ -1,5 +1,6 @@
 # coding: utf-8
 require "./traverse"
+
 # Constructing an NFA for our RegEx implementation
 # based on
 # https://swtch.com/~rsc/regexp/regexp1.html &
@@ -8,8 +9,8 @@ require "./traverse"
 module DFA
   module NFA
     include Traverse
-    module ClassMethods
 
+    module ClassMethods
       # Match State -> fin
       private def matchstate
         State.new(MATCH)
@@ -40,14 +41,14 @@ module DFA
       end
 
       private def intersect_segments(s1, s2)
-        min = s1[0] < s2[0]  ? s1 : s2
+        min = s1[0] < s2[0] ? s1 : s2
         max = (min == s1) ? s2 : s1
 
         if min[1] < max[0]
           return nil
         else
-          { max[0],
-            min[1] < max[1] ? min[1] : max[1] }
+          {max[0],
+           min[1] < max[1] ? min[1] : max[1]}
         end
       end
     end
@@ -112,8 +113,8 @@ module DFA
           symbols.push sym
           state = State.new(sym)
           nfa.push Fragment.new state, [state.outp]
-        # A CharacterClass Node is a Literalnode as we
-        # store literal values as {begin, end} anyway
+          # A CharacterClass Node is a Literalnode as we
+          # store literal values as {begin, end} anyway
         when AST::CharacterClassNode
           r = node.ranges.first
           sym = {r.begin.ord, r.end.ord}
@@ -134,22 +135,23 @@ module DFA
 
       def clone(references : Hash(UInt64, State) = Hash(UInt64, State).new)
         if references[self.object_id]?
-             return references[self.object_id]
-           else
-             n = State.allocate
-             n.c = c
-             references[self.object_id] = n
-             n.out = out ? out.as(State).clone(references) : nil
-             n.out1 = out1 ? out1.as(State).clone(references) : nil
-             n
+          return references[self.object_id]
+        else
+          n = State.allocate
+          n.c = c
+          references[self.object_id] = n
+          n.out = out ? out.as(State).clone(references) : nil
+          n.out1 = out1 ? out1.as(State).clone(references) : nil
+          n
         end
       end
 
       def initialize(
-            @c : {Int32, Int32}, # segments to represent a character
-            # a => {97,97}, [a-z] => {97, 122}
-            @out : State? = nil, @out1 : State? = nil,
-            @lastlist : Int32? = nil); end
+        @c : {Int32, Int32}, # segments to represent a character
+        # a => {97,97}, [a-z] => {97, 122}
+        @out : State? = nil, @out1 : State? = nil,
+        @lastlist : Int32? = nil
+      ); end
 
       def outp
         pointerof(@out)
@@ -162,7 +164,6 @@ module DFA
       def <=>(other)
         object_id <=> other.object_id
       end
-
     end
 
     class Fragment

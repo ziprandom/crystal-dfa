@@ -3,20 +3,20 @@ module DFA
 
   class Lexer
     IDENTIFIERS = {
-      '(' => :LPAREN,
-      ')' => :RPAREN,
-      '[' => :LBRACK,
-      ']' => :RBRACK,
-      '{' => :LCURLY,
-      '}' => :RCURLY,
-      '+' => :PLUS,
-      '-' => :MINUS,
-      '*' => :ASTERISK,
-      '?' => :QSTM,
-      '|' => :PIPE,
-      '^' => :NEGATE,
+      '('  => :LPAREN,
+      ')'  => :RPAREN,
+      '['  => :LBRACK,
+      ']'  => :RBRACK,
+      '{'  => :LCURLY,
+      '}'  => :RCURLY,
+      '+'  => :PLUS,
+      '-'  => :MINUS,
+      '*'  => :ASTERISK,
+      '?'  => :QSTM,
+      '|'  => :PIPE,
+      '^'  => :NEGATE,
       '\\' => :ESCAPE,
-      '.' => :DOT
+      '.'  => :DOT,
     }
 
     @pos = 0
@@ -41,5 +41,4 @@ module DFA
       token
     end
   end
-
 end

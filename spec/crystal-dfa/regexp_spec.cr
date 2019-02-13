@@ -2,7 +2,6 @@
 require "../spec_helper"
 
 describe DFA::RegExp do
-
   it "matches a string against a very simple regex" do
     rex = DFA::RegExp.new "[^a-z]"
     rex.match("A").should be_truthy
@@ -123,7 +122,6 @@ describe DFA::RegExp do
     rex.match("4").should be_truthy
     rex.match("1").should be_truthy
   end
-
 
   it "matches special characters whitespace" do
     rex = /[\s]+/.cr

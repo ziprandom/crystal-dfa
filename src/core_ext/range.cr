@@ -1,5 +1,4 @@
 module IntersectionMethods(T)
-
   # Takes an Array of Ranges and returns an
   # Array of Ranges that cover the same elements
   # and are guaranteed not to overlap
@@ -30,20 +29,20 @@ module IntersectionMethods(T)
     elsif self != other && bo >= bs && eo <= es
       # other included in self
       if eo == es
-        [{bs, bo-1}]
+        [{bs, bo - 1}]
       elsif bo == bs
-        [{bo+1, es}]
+        [{bo + 1, es}]
       else
-        [{bs, bo-1}, {eo+1, es}]
+        [{bs, bo - 1}, {eo + 1, es}]
       end
-    elsif self == other || ( bs >= bo && es <= eo )
+    elsif self == other || (bs >= bo && es <= eo)
       # self included in other
       # or both the same
       Array(T).new
     elsif bo >= bs
-      [{bs, bo-1}]
-    else #if bs >= bo
-      [{eo+1, es}]
+      [{bs, bo - 1}]
+    else # if bs >= bo
+      [{eo + 1, es}]
     end
   end
 end
@@ -54,7 +53,6 @@ struct Tuple(T)
   def -(other : self)
     minus_impl(other)
   end
-
 end
 
 struct Range(B, E)
@@ -66,6 +64,6 @@ struct Range(B, E)
   def -(other : self)
     bs, es = self.begin, self.exclusive? ? self.end.pred : self.end
     bo, eo = other.begin, other.exclusive? ? other.end.pred : other.end
-    (({bs, es}) - ({bo, eo})).map { |r| (r[0]..r[1])}
+    (({bs, es}) - ({bo, eo})).map { |r| (r[0]..r[1]) }
   end
 end

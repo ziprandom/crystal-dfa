@@ -4,6 +4,6 @@ version: 0.4.1
 authors:
   - ziprandom <ziprandom@gmail.com>
 
-crystal: 0.21.1
+crystal: 0.26.1
 
 license: MIT

@@ -4,9 +4,7 @@ require "./nodes"
 require "../core_ext/*"
 
 module DFA
-
   class Parser
-
     Precedence = {
       PIPE:     1,
       LITERAL:  2,
@@ -19,35 +17,35 @@ module DFA
     }
 
     PREFIX_PARSLETS = {
-      :LITERAL =>  NameParslet.new,
-      :LPAREN  =>  GroupParslet.new,
-      :LBRACK  =>  CharacterClassParslet.new,
-      :ESCAPE  =>  SpecialCharacterClassParslet.new,
-      :DOT     =>  AnyCharacterParslet.new
+      :LITERAL => NameParslet.new,
+      :LPAREN  => GroupParslet.new,
+      :LBRACK  => CharacterClassParslet.new,
+      :ESCAPE  => SpecialCharacterClassParslet.new,
+      :DOT     => AnyCharacterParslet.new,
     }
 
     INFIX_PARSLETS = {
-      :LITERAL  =>  ConcatParslet.new(Precedence[:LITERAL]),
-      :ESCAPE   =>  ConcatParslet.new(Precedence[:LITERAL]),
-      :DOT      =>  ConcatParslet.new(Precedence[:LITERAL]),
-      :LPAREN   =>  ConcatParslet.new(Precedence[:LITERAL]),
-      :LBRACK   =>  ConcatParslet.new(Precedence[:LITERAL]),
-      :PLUS     =>  QuantifierParslet(AST::PlusNode).new(Precedence[:PLUS]),
-      :QSTM     =>  QuantifierParslet(AST::QSTMNode).new(Precedence[:QSTM]),
-      :ASTERISK =>  QuantifierParslet(AST::StarNode).new(Precedence[:ASTERISK]),
-      :PIPE     =>  AlternationParslet.new(Precedence[:PIPE]),
-      :MINUS    =>  CharacterRangeParslet.new(Precedence[:MINUS]),
-      :LCURLY   =>  CurlyQuantifierParslet.new(Precedence[:LCURLY])
+      :LITERAL  => ConcatParslet.new(Precedence[:LITERAL]),
+      :ESCAPE   => ConcatParslet.new(Precedence[:LITERAL]),
+      :DOT      => ConcatParslet.new(Precedence[:LITERAL]),
+      :LPAREN   => ConcatParslet.new(Precedence[:LITERAL]),
+      :LBRACK   => ConcatParslet.new(Precedence[:LITERAL]),
+      :PLUS     => QuantifierParslet(AST::PlusNode).new(Precedence[:PLUS]),
+      :QSTM     => QuantifierParslet(AST::QSTMNode).new(Precedence[:QSTM]),
+      :ASTERISK => QuantifierParslet(AST::StarNode).new(Precedence[:ASTERISK]),
+      :PIPE     => AlternationParslet.new(Precedence[:PIPE]),
+      :MINUS    => CharacterRangeParslet.new(Precedence[:MINUS]),
+      :LCURLY   => CurlyQuantifierParslet.new(Precedence[:LCURLY]),
     }
 
-    ANY_CHAR_RANGES    =  [0.unsafe_chr..Char::MAX_CODEPOINT.unsafe_chr]
-    WHITESPACE_RANGES  =  [' '..' ']
-    TAB_RANGES         =  ['\t'..'\t']
-    CR_RANGES          =  ['\r'..'\r']
-    WORD_RANGES        =  ['a'..'z', 'A'..'Z']
-    NOT_WORD_RANGES    =  [0.unsafe_chr..'`', '{'..'@', '['..Char::MAX_CODEPOINT.unsafe_chr]
-    DIGIT_RANGES       =  ['0'..'9']
-    NON_DIGIT_RANGES   =  [10.unsafe_chr..Char::MAX_CODEPOINT.unsafe_chr]
+    ANY_CHAR_RANGES   = [0.unsafe_chr..Char::MAX_CODEPOINT.unsafe_chr]
+    WHITESPACE_RANGES = [' '..' ']
+    TAB_RANGES        = ['\t'..'\t']
+    CR_RANGES         = ['\r'..'\r']
+    WORD_RANGES       = ['a'..'z', 'A'..'Z']
+    NOT_WORD_RANGES   = [0.unsafe_chr..'`', '{'..'@', '['..Char::MAX_CODEPOINT.unsafe_chr]
+    DIGIT_RANGES      = ['0'..'9']
+    NON_DIGIT_RANGES  = [10.unsafe_chr..Char::MAX_CODEPOINT.unsafe_chr]
 
     def initialize(string)
       @lexer = Lexer.new(string)
@@ -79,7 +77,6 @@ module DFA
       left = prefix.parse(self, token)
 
       while (precedence < getPrecedence)
-
         _token = peek
         break unless _token
 
@@ -93,7 +90,7 @@ module DFA
     end
 
     private def getPrecedence
-      if (_peek = peek) &&(_p = INFIX_PARSLETS[_peek[:type]]?)
+      if (_peek = peek) && (_p = INFIX_PARSLETS[_peek[:type]]?)
         _p.precedence
       else
         0
@@ -111,7 +108,7 @@ module DFA
     def consume(_type : Symbol)
       _next = consume
       unless _next && _next[:type] == _type
-        raise "expected `#{Lexer::IDENTIFIERS.key_for?(_type)||_type}` got `#{_next}`"
+        raise "expected `#{Lexer::IDENTIFIERS.key_for?(_type) || _type}` got `#{_next}`"
       end
       _next
     end
@@ -120,14 +117,13 @@ module DFA
       def initialize(@message : String, @pos : Int32, @source : String); end
 
       def to_s
-       <<-error
+        <<-error
          #{@message}
 
          /#{@source}/
-         -#{(@pos-1).times.map {'-'}.join}^
+         -#{(@pos - 1).times.map { '-' }.join}^
        error
       end
-
     end
 
     #
@@ -140,6 +136,7 @@ module DFA
 
     abstract class InfixParslet
       getter :precedence
+
       abstract def parse(parser : Parser2, left : AST::ASTNode, token : Token) : AST::ASTNode
 
       def initialize(@precedence = 0); end
@@ -162,13 +159,11 @@ module DFA
         _next = parser.consume
         raise "unexpected end of input" unless _next
 
-        value = _next[:type] == :LITERAL ?
-                  _next[:value] :
-                  # translate specia characters back to
-                  # their string representation because
-                  # we won't interprete them inside a
-                  # characterclass
-                  Lexer::IDENTIFIERS.key_for(_next[:type])
+        value = _next[:type] == :LITERAL ? _next[:value] : # translate specia characters back to
+        # their string representation because
+        # we won't interprete them inside a
+        # characterclass
+Lexer::IDENTIFIERS.key_for(_next[:type])
 
         case value
         when 's' then AST::LiteralNode.new(WHITESPACE_RANGES.first.begin)
@@ -179,7 +174,7 @@ module DFA
         when 'W' then AST::CharacterClassNode.new(true, Array(String).new, WORD_RANGES)
         when 'd' then AST::CharacterClassNode.new(false, Array(String).new, DIGIT_RANGES)
         when 'D' then AST::CharacterClassNode.new(true, Array(String).new, DIGIT_RANGES)
-        else AST::LiteralNode.new(value.not_nil!)
+        else          AST::LiteralNode.new(value.not_nil!)
         end
       end
     end
@@ -274,7 +269,7 @@ module DFA
       def parse(parser, left : AST::ASTNode, token)
         exp = AST::ConcatNode.new([left.as(AST::ASTNode)])
 
-        _next = parser.parseExpression(Precedence[:LITERAL]-1).as(AST::ASTNode?)
+        _next = parser.parseExpression(Precedence[:LITERAL] - 1).as(AST::ASTNode?)
 
         case _next
         when AST::ConcatNode
@@ -301,18 +296,18 @@ module DFA
 
       def parse_quantifications(value : AST::ASTNode?)
         raise "bad" unless value
-        exact, min, max = nil, nil, nil;
+        exact, min, max = nil, nil, nil
         if value.is_a? AST::LiteralNode
           exact = value.value.to_i
-        elsif ( nodes = value.as(AST::ConcatNode)
-                        .nodes.map &.as(AST::LiteralNode) ) &&
-              ( str = nodes.map(&.value).join ) &&
-              ( commaindex = str.index(",") )
+        elsif (nodes = value.as(AST::ConcatNode)
+                .nodes.map &.as(AST::LiteralNode)) &&
+              (str = nodes.map(&.value).join) &&
+              (commaindex = str.index(","))
           min = str[0...commaindex].to_i
           max = begin
-                  s = str[commaindex+1..-1]
-                  s.size > 0 ? s.to_i : nil
-                end
+            s = str[commaindex + 1..-1]
+            s.size > 0 ? s.to_i : nil
+          end
         else
           exact = nodes.map(&.value).join.to_i
         end
@@ -339,6 +334,5 @@ module DFA
         exp
       end
     end
-
   end
 end
