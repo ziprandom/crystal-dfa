@@ -7,3 +7,7 @@ authors:
 crystal: 0.26.1
 
 license: MIT
+
+targets:
+  benchmark:
+    main: benchmark/compare.cr

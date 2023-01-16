@@ -1,7 +1,8 @@
 require "../src/crystal-dfa"
 require "benchmark"
 
-rx1, rx2 = nil, nil
+rx1 = nil
+rx2 = nil
 expression = /(?:x+x+)+y/
 string = "xxxxxxxxxxxxxy"
 # expression = /"([^"\\]|\\.)*"/
@@ -13,26 +14,27 @@ string = "xxxxxxxxxxxxxy"
 puts
 puts %{building "#{expression}" with Regex (PCRE)}
 puts Benchmark.measure { rx1 = Regex.new(expression.source) }
-rx1 = rx1.not_nil!
+rx1ok = rx1.not_nil!
+
 puts %{building "#{expression}" with RegExp (own impl}
-puts Benchmark.measure { rx2 = rx1.cr }
-rx2 = rx2.not_nil!
+puts Benchmark.measure { rx2 = DFA::RegExp.new(expression.source) } # rx1ok.cr }
+rx2ok = rx2.not_nil!
 
 puts
 puts %{matching "#{string}" a first time with Regex (PCRE)}
-puts Benchmark.measure { rx1.match string }
-pp rx1.match string
+puts Benchmark.measure { rx1ok.match string }
+pp rx1ok.match string
 puts
 puts %{matching "#{string}" a first time with RegExp (own impl}
-puts Benchmark.measure { rx2.match string }
-pp rx2.match string
+puts Benchmark.measure { rx2ok.match string }
+pp rx2ok.match string
 puts
 
-Benchmark.measure { rx1.not_nil!.match string }
-Benchmark.measure { rx2.not_nil!.match string }
+Benchmark.measure { rx1ok.match string }
+Benchmark.measure { rx2ok.match string }
 
 Benchmark.ips do |x|
-  x.report("Regex (PCRE) matching : #{string}") { rx1.not_nil!.match string }
-  x.report("RegExp (own impl) matching : #{string}") { rx2.not_nil!.match string }
+  x.report("Regex (PCRE) matching : #{string}") { rx2ok.match string }
+  x.report("RegExp (own impl) matching : #{string}") { rx2ok.match string }
 end
 puts
