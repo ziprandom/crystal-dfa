@@ -13,10 +13,9 @@ module IntersectionMethods(T)
   end
 
   macro included
-
     def disjoin(other : self)
       [other] + (self - other)
-      #[self] + (other - self)
+      # [self] + (other - self)
     end
   end
 
@@ -47,7 +46,7 @@ module IntersectionMethods(T)
   end
 end
 
-struct Tuple(T)
+struct Tuple(*T)
   include IntersectionMethods(T)
 
   def -(other : self)
