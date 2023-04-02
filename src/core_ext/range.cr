@@ -47,7 +47,7 @@ module IntersectionMethods(T)
   end
 end
 
-struct Tuple(T)
+struct Tuple(*T)
   include IntersectionMethods(T)
 
   def -(other : self)
