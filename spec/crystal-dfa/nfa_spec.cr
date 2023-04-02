@@ -8,7 +8,7 @@ describe DFA::NFA do
       DFA::NFA.create_nfa(ast).should eq expected
     end
 
-    it "creates a state for a ConcateNode" do
+    describe "creates a state for a ConcateNode" do
       it "works for the binary case" do
         ast = DFA::AST::ConcatNode.new [
           DFA::AST::LiteralNode.new('a').as(DFA::AST::ASTNode),
@@ -31,7 +31,7 @@ describe DFA::NFA do
       end
     end
 
-    it "creates a state for an AlternationNode" do
+    describe "creates a state for an AlternationNode" do
       it "works for the binary case" do
         ast = DFA::AST::AlternationNode.new [
           DFA::AST::LiteralNode.new('a').as(DFA::AST::ASTNode),
@@ -99,7 +99,7 @@ describe DFA::NFA do
         DFA::NFA.create_nfa(ast).should eq expected
       end
 
-      it "creates a state for a CharacterClassNode([a-z]) One-or-More" do
+      describe "creates a state for a CharacterClassNode([a-z]) One-or-More" do
         it "creates a state for the simple range case [a-z]" do
           ast = DFA::AST::CharacterClassNode.new(false, Array(String).new, [('a'..'z')])
           expected = r_state('a', 'z')
